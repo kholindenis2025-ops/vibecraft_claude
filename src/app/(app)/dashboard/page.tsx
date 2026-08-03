@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Trophy, Flame, CheckCircle2, ArrowRight } from "lucide-react";
+import { Trophy, Flame, CheckCircle2, ArrowRight, BookOpen } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { getCourseSummary } from "@/lib/progress";
 import { prisma } from "@/lib/prisma";
@@ -9,6 +9,9 @@ export default async function DashboardPage() {
   const summary = await getCourseSummary(user.id);
   const unlockedCount = await prisma.userAchievement.count({ where: { userId: user.id } });
   const totalAchievements = await prisma.achievement.count();
+
+  const coreModules = summary.modules.filter((m) => m.category === "MODULE");
+  const completedCoreModules = coreModules.filter((m) => m.isComplete).length;
 
   const nextModule =
     summary.modules.find((m) => !m.isComplete && m.completedLessons > 0) ??
@@ -44,8 +47,8 @@ export default async function DashboardPage() {
             <span className="text-sm font-medium">Модули пройдены</span>
           </div>
           <p className="text-2xl font-bold">
-            {summary.completedModules}
-            <span className="text-base font-normal text-text-dim"> / {summary.modules.length}</span>
+            {completedCoreModules}
+            <span className="text-base font-normal text-text-dim"> / {coreModules.length}</span>
           </p>
         </div>
 
@@ -82,31 +85,18 @@ export default async function DashboardPage() {
         </Link>
       )}
 
-      <div>
-        <h2 className="mb-4 text-lg font-bold">Программа курса</h2>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {summary.modules.map((m, i) => (
-            <Link key={m.id} href={`/modules/${m.slug}`} className="card card-hover p-5">
-              <div className="mb-3 flex items-center gap-3">
-                <span className="text-2xl">{m.icon}</span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs text-text-dim">Модуль {i + 1}</p>
-                  <p className="truncate font-bold leading-snug">{m.title}</p>
-                </div>
-                {m.isComplete && (
-                  <CheckCircle2 className="shrink-0 text-accent" size={20} />
-                )}
-              </div>
-              <div className="progress-track">
-                <div className="progress-fill" style={{ width: `${m.percent}%` }} />
-              </div>
-              <p className="mt-2 text-xs text-text-dim">
-                {m.completedLessons} / {m.totalLessons} уроков · {m.percent}%
-              </p>
-            </Link>
-          ))}
+      <Link href="/learn" className="card card-hover flex items-center gap-4 p-5 sm:p-6">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
+          <BookOpen size={22} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-bold">Вся программа курса</p>
+          <p className="text-sm text-text-muted">
+            Введение · {coreModules.length} модулей · инструментарий · бонус и материалы
+          </p>
         </div>
-      </div>
+        <ArrowRight className="shrink-0 text-text-dim" size={20} />
+      </Link>
     </div>
   );
 }

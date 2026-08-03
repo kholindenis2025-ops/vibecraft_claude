@@ -35,11 +35,14 @@ type LessonDef = {
   homework?: HomeworkDef;
 };
 
+type ModuleCategory = "INTRO" | "MODULE" | "TOOL" | "BONUS" | "MATERIAL";
+
 type ModuleDef = {
   slug: string;
   title: string;
   description: string;
   icon: string;
+  category: ModuleCategory;
   externalUrl?: string;
   lessons: LessonDef[];
 };
@@ -58,6 +61,7 @@ function homeworkFor(title: string, description: string): HomeworkDef {
 const modules: ModuleDef[] = [
   {
     slug: "top-30-oshibok",
+    category: "TOOL",
     title: "Топ-30 ошибок вайб-кодинга",
     description:
       "Чек-лист главных ошибок новичков в вайб-кодинге — чтобы не наступать на грабли, на которых уже все обожглись.",
@@ -177,6 +181,7 @@ const modules: ModuleDef[] = [
   },
   {
     slug: "podgotovka-motivaciya",
+    category: "INTRO",
     title: "Подготовка к обучению и мотивация",
     description: "Настраиваемся на курс, разбираемся с инструментами и формулируем свою личную цель.",
     icon: "🔥",
@@ -222,6 +227,7 @@ const modules: ModuleDef[] = [
   },
   {
     slug: "modul-1-s-chego-nachat",
+    category: "MODULE",
     title: "Модуль 1. С чего начать: твоя идея и первый продукт",
     description: "От идеи до первого работающего прототипа продукта.",
     icon: "💡",
@@ -252,6 +258,7 @@ const modules: ModuleDef[] = [
   },
   {
     slug: "modul-2-trend-radar",
+    category: "MODULE",
     title: "Модуль 2. Тренд-радар: собираешь на самом свежем",
     description: "Учимся находить свежие идеи и тренды и превращать их в продукты.",
     icon: "📡",
@@ -281,6 +288,7 @@ const modules: ModuleDef[] = [
   },
   {
     slug: "modul-3-pervye-produkty",
+    category: "MODULE",
     title: "Модуль 3. Твои первые продукты: от А до Я",
     description: "Полный цикл создания продукта — от технического задания до готового результата.",
     icon: "🧩",
@@ -313,6 +321,7 @@ const modules: ModuleDef[] = [
   },
   {
     slug: "modul-4-ot-chernovika-do-produkta",
+    category: "MODULE",
     title: "Модуль 4. От черновика до продукта в интернете",
     description: "Публикуем продукт в интернете: хостинг, домен, безопасность, аналитика и мониторинг.",
     icon: "🌐",
@@ -351,6 +360,7 @@ const modules: ModuleDef[] = [
   },
   {
     slug: "modul-5-pervye-klienty-dengi",
+    category: "MODULE",
     title: "Модуль 5. Первые клиенты и деньги",
     description: "От первого продукта — к первым деньгам: поиск клиентов, продажи, оплата.",
     icon: "💰",
@@ -380,6 +390,7 @@ const modules: ModuleDef[] = [
   },
   {
     slug: "modul-6-sprint-10-dney",
+    category: "MODULE",
     title: "Модуль 6. Спринт: 10 дней до первого клиента",
     description: "Интенсивный практический спринт: за 10 дней проходим путь от идеи до первой сделки.",
     icon: "🏁",
@@ -416,6 +427,7 @@ const modules: ModuleDef[] = [
   },
   {
     slug: "codex-skills-map",
+    category: "TOOL",
     title: "Карта скиллов для Codex",
     description: "Разбираемся, какие навыки (скиллы) можно прокачать у Codex и как ими пользоваться.",
     icon: "🗺️",
@@ -442,6 +454,7 @@ const modules: ModuleDef[] = [
   },
   {
     slug: "skills-starter-kit",
+    category: "TOOL",
     title: "Скиллы для Claude Code и Codex",
     description: "Стартовый набор готовых скиллов для Claude Code и Codex — устанавливаем и адаптируем под себя.",
     icon: "🧰",
@@ -468,6 +481,7 @@ const modules: ModuleDef[] = [
   },
   {
     slug: "claude-codex-deshevle",
+    category: "TOOL",
     title: "Claude и Codex на 80% дешевле",
     description: "Разбираемся, как экономить на работе с ИИ-агентами без потери качества.",
     icon: "💸",
@@ -493,6 +507,7 @@ const modules: ModuleDef[] = [
   },
   {
     slug: "skills-dlya-agenta",
+    category: "TOOL",
     title: "Скиллы для твоего агента",
     description: "Проектируем и подключаем собственные скиллы под рутинные задачи твоего агента.",
     icon: "🤖",
@@ -519,6 +534,7 @@ const modules: ModuleDef[] = [
   },
   {
     slug: "bonus-vibecoding-s-telefona",
+    category: "BONUS",
     title: "Бонус: Вайбкодинг с телефона",
     description: "Помощник прямо в Telegram: правишь свой продукт удалённо, без компьютера, с пляжа или кафе.",
     icon: "📱",
@@ -541,6 +557,7 @@ const modules: ModuleDef[] = [
   },
   {
     slug: "poleznye-materialy-i-stati",
+    category: "MATERIAL",
     title: "Полезные доп. материалы и статьи",
     description: "Подборка статей, промптов и источников вдохновения для дальнейшего развития.",
     icon: "📚",
@@ -569,6 +586,7 @@ async function main() {
       where: { slug: m.slug },
       update: {
         order: i + 1,
+        category: m.category,
         title: m.title,
         description: m.description,
         icon: m.icon,
@@ -577,6 +595,7 @@ async function main() {
       create: {
         slug: m.slug,
         order: i + 1,
+        category: m.category,
         title: m.title,
         description: m.description,
         icon: m.icon,

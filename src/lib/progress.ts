@@ -24,6 +24,7 @@ export async function getModulesWithProgress(userId: string) {
     return {
       id: mod.id,
       slug: mod.slug,
+      category: mod.category,
       title: mod.title,
       description: mod.description,
       icon: mod.icon,

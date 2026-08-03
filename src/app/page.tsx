@@ -11,15 +11,25 @@ import {
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { CATEGORY_LABELS, categoryBadge, groupByCategory } from "@/lib/categories";
 
 export default async function HomePage() {
   const user = await getCurrentUser();
   const modules = await prisma.module.findMany({
     orderBy: { order: "asc" },
-    select: { title: true, icon: true, description: true, lessons: { select: { id: true } } },
+    select: {
+      slug: true,
+      category: true,
+      title: true,
+      icon: true,
+      description: true,
+      lessons: { select: { id: true } },
+    },
   });
 
   const totalLessons = modules.reduce((sum, m) => sum + m.lessons.length, 0);
+  const coreModuleCount = modules.filter((m) => m.category === "MODULE").length;
+  const groups = groupByCategory(modules);
   const ctaHref = user ? "/dashboard" : "/register";
   const ctaLabel = user ? "Перейти в дашборд" : "Начать бесплатно";
 
@@ -59,8 +69,8 @@ export default async function HomePage() {
         </h1>
         <p className="max-w-xl text-lg text-text-muted">
           Создавай реальные продукты с помощью ИИ — даже если раньше никогда не программировал.{" "}
-          {modules.length} модулей, {totalLessons} уроков, тесты, домашние задания с проверкой,
-          прогресс и достижения.
+          {coreModuleCount} модулей от идеи до дохода, плюс инструментарий, бонусы и материалы —{" "}
+          {totalLessons} уроков, тесты, домашние задания с проверкой, прогресс и достижения.
         </p>
         <div className="flex flex-wrap items-center gap-3">
           <Link href={ctaHref} className="btn-primary text-base">
@@ -95,20 +105,27 @@ export default async function HomePage() {
           <div>
             <span className="kicker">Программа курса</span>
             <h2 className="mt-2 text-2xl font-bold sm:text-3xl">
-              {modules.length} модулей — от идеи до дохода
+              {coreModuleCount} модулей — от идеи до дохода
             </h2>
           </div>
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {modules.map((m, i) => (
-            <div key={m.title} className="card card-hover p-5">
-              <div className="mb-3 flex items-center gap-3">
-                <span className="text-2xl">{m.icon}</span>
-                <span className="badge">Модуль {i + 1}</span>
-                <span className="ml-auto text-xs text-text-dim">{m.lessons.length} уроков</span>
+        <div className="flex flex-col gap-8">
+          {groups.map((group) => (
+            <div key={group.category}>
+              <span className="badge-accent mb-3 inline-flex">{CATEGORY_LABELS[group.category]}</span>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {group.items.map((m, i) => (
+                  <div key={m.slug} className="card card-hover p-5">
+                    <div className="mb-3 flex items-center gap-3">
+                      <span className="text-2xl">{m.icon}</span>
+                      <span className="badge">{categoryBadge(group.category, i + 1)}</span>
+                      <span className="ml-auto text-xs text-text-dim">{m.lessons.length} уроков</span>
+                    </div>
+                    <h3 className="mb-1.5 font-bold leading-snug">{m.title}</h3>
+                    <p className="text-sm text-text-muted">{m.description}</p>
+                  </div>
+                ))}
               </div>
-              <h3 className="mb-1.5 font-bold leading-snug">{m.title}</h3>
-              <p className="text-sm text-text-muted">{m.description}</p>
             </div>
           ))}
         </div>

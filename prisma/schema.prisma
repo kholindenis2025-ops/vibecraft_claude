@@ -20,6 +20,14 @@ enum SubmissionStatus {
   REJECTED
 }
 
+enum ModuleCategory {
+  INTRO
+  MODULE
+  TOOL
+  BONUS
+  MATERIAL
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -37,14 +45,15 @@ model User {
 }
 
 model Module {
-  id          String   @id @default(cuid())
-  slug        String   @unique
+  id          String         @id @default(cuid())
+  slug        String         @unique
   order       Int
+  category    ModuleCategory @default(MODULE)
   title       String
   description String
-  icon        String   @default("📦")
+  icon        String         @default("📦")
   externalUrl String?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime       @default(now())
 
   lessons Lesson[]
 }

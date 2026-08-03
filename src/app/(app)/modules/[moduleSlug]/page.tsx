@@ -35,8 +35,8 @@ export default async function ModulePage({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Link href="/dashboard" className="text-sm text-text-muted hover:text-accent">
-          ← Все модули
+        <Link href="/learn" className="text-sm text-text-muted hover:text-accent">
+          ← Вся программа
         </Link>
       </div>
 
