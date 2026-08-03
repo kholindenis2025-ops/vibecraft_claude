@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VIBECRAFT — Vibe Coding от нуля до про
 
-## Getting Started
+Обучающая платформа: 14 модулей, уроки (текст + видео + презентации), тесты, домашние задания с проверкой куратором, прогресс и достижения.
 
-First, run the development server:
+Стек: Next.js 16 (App Router, Turbopack) · Prisma 7 · PostgreSQL (Neon) · собственная JWT-авторизация (email/пароль).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Локальная разработка
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Скопируйте `.env.example` в `.env` и заполните `DATABASE_URL`, `DIRECT_URL` (обе строки — из Neon) и `AUTH_SECRET`.
+2. Установите зависимости и примените миграции:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+   ```bash
+   npm install
+   npx prisma migrate dev --name init
+   npx prisma db seed
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Запустите dev-сервер:
 
-## Learn More
+   ```bash
+   npm run dev
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+   Откройте [http://localhost:3000](http://localhost:3000).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Тестовый админ-аккаунт (создаётся сидом): `admin@vibecraft.local` / `admin12345` — смените пароль перед продакшеном.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Деплой на Vercel
 
-## Deploy on Vercel
+См. пошаговую инструкцию, которую даёт ассистент, либо кратко:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Создайте Postgres-базу в Vercel (Storage → Postgres, на базе Neon).
+2. В Project Settings → Environment Variables добавьте `DATABASE_URL` (pooled), `DIRECT_URL` (direct) и `AUTH_SECRET`.
+3. Импортируйте GitHub-репозиторий в Vercel — сборка автоматически выполнит `prisma generate && prisma migrate deploy && next build`.
+4. После первого деплоя выполните `npx prisma db seed` с продакшен-`DATABASE_URL`, чтобы наполнить курс модулями.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Структура контента
+
+Модули и уроки заданы в `prisma/seed.ts`. Поля `videoUrl`, `slidesUrl`, `driveUrl` и `content` у уроков можно донаполнять по мере готовности материалов (ссылки с Google Диска, видео, презентации).

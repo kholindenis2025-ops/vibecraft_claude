@@ -1,0 +1,164 @@
+// Prisma schema for VIBECRAFT — Vibe Coding: от нуля до про
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+enum SubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(STUDENT)
+  avatarEmoji  String   @default("🚀")
+  createdAt    DateTime @default(now())
+
+  lessonProgress   LessonProgress[]
+  quizAttempts     QuizAttempt[]
+  submissions      HomeworkSubmission[] @relation("StudentSubmissions")
+  reviewedByAdmin  HomeworkSubmission[] @relation("ReviewerSubmissions")
+  achievements     UserAchievement[]
+}
+
+model Module {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  order       Int
+  title       String
+  description String
+  icon        String   @default("📦")
+  externalUrl String?
+  createdAt   DateTime @default(now())
+
+  lessons Lesson[]
+}
+
+model Lesson {
+  id          String  @id @default(cuid())
+  moduleId    String
+  module      Module  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  order       Int
+  slug        String
+  title       String
+  summary     String  @default("")
+  content     String  @default("")
+  videoUrl    String?
+  driveUrl    String?
+  slidesUrl   String?
+  durationMin Int     @default(10)
+
+  progress LessonProgress[]
+  quiz     Quiz?
+  homework Homework?
+
+  @@unique([moduleId, slug])
+}
+
+model LessonProgress {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId    String
+  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+
+  @@unique([userId, lessonId])
+}
+
+model Quiz {
+  id       String @id @default(cuid())
+  lessonId String @unique
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  title    String @default("Проверь себя")
+  passScore Int   @default(70)
+
+  questions QuizQuestion[]
+  attempts  QuizAttempt[]
+}
+
+model QuizQuestion {
+  id      String @id @default(cuid())
+  quizId  String
+  quiz    Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  order   Int
+  text    String
+  options String // JSON-encoded string[]
+  correctIndex Int
+  explanation String @default("")
+}
+
+model QuizAttempt {
+  id        String   @id @default(cuid())
+  quizId    String
+  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  score     Int
+  passed    Boolean
+  answers   String // JSON-encoded number[]
+  createdAt DateTime @default(now())
+}
+
+model Homework {
+  id          String @id @default(cuid())
+  lessonId    String @unique
+  lesson      Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+
+  submissions HomeworkSubmission[]
+}
+
+model HomeworkSubmission {
+  id           String           @id @default(cuid())
+  homeworkId   String
+  homework     Homework         @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+  studentId    String
+  student      User             @relation("StudentSubmissions", fields: [studentId], references: [id], onDelete: Cascade)
+  answerText   String
+  answerUrl    String?
+  status       SubmissionStatus @default(PENDING)
+  feedback     String?
+  reviewedById String?
+  reviewedBy   User?            @relation("ReviewerSubmissions", fields: [reviewedById], references: [id])
+  createdAt    DateTime         @default(now())
+  reviewedAt   DateTime?
+}
+
+model Achievement {
+  id          String @id @default(cuid())
+  code        String @unique
+  title       String
+  description String
+  icon        String @default("🏆")
+
+  users UserAchievement[]
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  unlockedAt    DateTime    @default(now())
+
+  @@unique([userId, achievementId])
+}
