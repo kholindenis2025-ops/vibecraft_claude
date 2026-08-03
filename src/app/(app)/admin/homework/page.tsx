@@ -42,7 +42,7 @@ export default async function AdminHomeworkPage({
         <h1 className="mt-1 text-2xl font-bold sm:text-3xl">Проверка домашних заданий</h1>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         {TABS.map((tab) => (
           <Link
             key={tab.key}
