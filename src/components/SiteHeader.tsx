@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, BookOpen, Trophy, ClipboardCheck, LogOut } from "lucide-react";
+import { LayoutDashboard, BookOpen, Trophy, ClipboardCheck, Users, LogOut } from "lucide-react";
 import { logoutAction } from "@/lib/actions/auth-actions";
 import { Logo } from "@/components/Logo";
 import { Avatar } from "@/components/Avatar";
@@ -46,13 +46,22 @@ export function SiteHeader({ user }: Props) {
             <span className="hidden sm:inline">Достижения</span>
           </Link>
           {user.role === "ADMIN" && (
-            <Link
-              href="/admin/homework"
-              className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
-            >
-              <ClipboardCheck size={16} />
-              <span className="hidden sm:inline">Проверка ДЗ</span>
-            </Link>
+            <>
+              <Link
+                href="/admin/homework"
+                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
+              >
+                <ClipboardCheck size={16} />
+                <span className="hidden sm:inline">Проверка ДЗ</span>
+              </Link>
+              <Link
+                href="/admin/users"
+                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
+              >
+                <Users size={16} />
+                <span className="hidden sm:inline">Пользователи</span>
+              </Link>
+            </>
           )}
         </nav>
 

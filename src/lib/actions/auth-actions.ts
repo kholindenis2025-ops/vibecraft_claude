@@ -10,11 +10,17 @@ export type AuthFormState = {
   error?: string;
 } | null;
 
-const registerSchema = z.object({
-  name: z.string().trim().min(2, "Имя должно быть не короче 2 символов").max(60),
-  email: z.string().trim().toLowerCase().email("Введите корректный email"),
-  password: z.string().min(6, "Пароль должен быть не короче 6 символов").max(100),
-});
+const registerSchema = z
+  .object({
+    name: z.string().trim().min(2, "Имя должно быть не короче 2 символов").max(60),
+    email: z.string().trim().toLowerCase().email("Введите корректный email"),
+    password: z.string().min(6, "Пароль должен быть не короче 6 символов").max(100),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Пароли не совпадают",
+    path: ["confirmPassword"],
+  });
 
 export async function registerAction(
   _prevState: AuthFormState,
@@ -24,6 +30,7 @@ export async function registerAction(
     name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
   });
 
   if (!parsed.success) {

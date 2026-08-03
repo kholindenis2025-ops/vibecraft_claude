@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { registerAction, type AuthFormState } from "@/lib/actions/auth-actions";
+import { PasswordInput } from "@/components/PasswordInput";
 
 export function RegisterForm() {
   const [state, formAction, pending] = useActionState<AuthFormState, FormData>(
@@ -28,14 +29,26 @@ export function RegisterForm() {
         <label htmlFor="password" className="text-sm font-medium text-text-muted">
           Пароль
         </label>
-        <input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           required
           minLength={6}
-          className="input"
+          autoComplete="new-password"
           placeholder="Минимум 6 символов"
+        />
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="confirmPassword" className="text-sm font-medium text-text-muted">
+          Повторите пароль
+        </label>
+        <PasswordInput
+          id="confirmPassword"
+          name="confirmPassword"
+          required
+          minLength={6}
+          autoComplete="new-password"
+          placeholder="Введите пароль ещё раз"
         />
       </div>
 

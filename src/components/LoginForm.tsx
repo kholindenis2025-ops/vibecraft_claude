@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { loginAction, type AuthFormState } from "@/lib/actions/auth-actions";
+import { PasswordInput } from "@/components/PasswordInput";
 
 export function LoginForm() {
   const [state, formAction, pending] = useActionState<AuthFormState, FormData>(loginAction, null);
@@ -19,7 +20,13 @@ export function LoginForm() {
         <label htmlFor="password" className="text-sm font-medium text-text-muted">
           Пароль
         </label>
-        <input id="password" name="password" type="password" required className="input" placeholder="Твой пароль" />
+        <PasswordInput
+          id="password"
+          name="password"
+          required
+          autoComplete="current-password"
+          placeholder="Твой пароль"
+        />
       </div>
 
       {state?.error && (
