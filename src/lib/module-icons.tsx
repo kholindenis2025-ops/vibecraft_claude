@@ -13,6 +13,7 @@ import {
   Bot,
   Smartphone,
   Library,
+  NotebookPen,
   type LucideIcon,
 } from "lucide-react";
 
@@ -31,6 +32,7 @@ export const MODULE_ICONS: Record<string, LucideIcon> = {
   bot: Bot,
   smartphone: Smartphone,
   library: Library,
+  "notebook-pen": NotebookPen,
 };
 
 export function ModuleIcon({
