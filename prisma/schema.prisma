@@ -52,6 +52,7 @@ model Module {
   description String
   icon        String         @default("compass")
   externalUrl String?
+  toolKey     String?
   createdAt   DateTime       @default(now())
 
   lessons Lesson[]

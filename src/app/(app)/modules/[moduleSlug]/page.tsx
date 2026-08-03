@@ -5,6 +5,9 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ModuleIcon } from "@/lib/module-icons";
 import { lessonsWord } from "@/lib/plural";
+import { hasTool, renderTool } from "@/components/tools";
+import { LessonCompleteButton } from "@/components/LessonCompleteButton";
+import { HomeworkForm } from "@/components/HomeworkForm";
 
 export default async function ModulePage({
   params,
@@ -22,13 +25,80 @@ export default async function ModulePage({
         include: {
           progress: { where: { userId: user.id } },
           quiz: { select: { id: true } },
-          homework: { select: { id: true } },
+          homework: {
+            include: {
+              submissions: {
+                where: { studentId: user.id },
+                orderBy: { createdAt: "desc" },
+                take: 1,
+              },
+            },
+          },
         },
       },
     },
   });
 
   if (!mod) notFound();
+
+  if (hasTool(mod.toolKey)) {
+    const lesson = mod.lessons[0];
+    const isDone = Boolean(lesson?.progress[0]?.completed);
+    const modulePath = `/modules/${mod.slug}`;
+    const lastSubmission = lesson?.homework?.submissions[0]
+      ? {
+          status: lesson.homework.submissions[0].status,
+          answerText: lesson.homework.submissions[0].answerText,
+          answerUrl: lesson.homework.submissions[0].answerUrl,
+          feedback: lesson.homework.submissions[0].feedback,
+        }
+      : null;
+
+    return (
+      <div className="flex flex-col gap-6">
+        <div>
+          <Link href="/learn" className="text-sm text-text-muted hover:text-accent">
+            ← Вся программа
+          </Link>
+        </div>
+
+        <div className="card p-6 sm:p-8">
+          <div className="flex items-start gap-4">
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-accent-soft text-accent">
+              <ModuleIcon iconKey={mod.icon} size={28} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl font-bold sm:text-2xl">{mod.title}</h1>
+              <p className="mt-1 text-text-muted">{mod.description}</p>
+            </div>
+          </div>
+          {lesson && (
+            <div className="mt-5 border-t border-border pt-5">
+              <LessonCompleteButton
+                lessonId={lesson.id}
+                initialCompleted={isDone}
+                modulePath={modulePath}
+                lessonPath={modulePath}
+              />
+            </div>
+          )}
+        </div>
+
+        {renderTool(mod.toolKey)}
+
+        {lesson?.homework && (
+          <HomeworkForm
+            homeworkId={lesson.homework.id}
+            title={lesson.homework.title}
+            description={lesson.homework.description}
+            modulePath={modulePath}
+            lessonPath={modulePath}
+            lastSubmission={lastSubmission}
+          />
+        )}
+      </div>
+    );
+  }
 
   const total = mod.lessons.length;
   const completed = mod.lessons.filter((l) => l.progress[0]?.completed).length;
