@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, CalendarClock } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { LessonContent } from "@/components/LessonContent";
@@ -70,11 +70,25 @@ export default async function LessonPage({
       </div>
 
       <div>
-        <span className="kicker">
-          Урок {index + 1} из {mod.lessons.length}
-        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="kicker">
+            Урок {index + 1} из {mod.lessons.length}
+          </span>
+          {lesson.format && <span className="badge">{lesson.format}</span>}
+        </div>
         <h1 className="mt-1 text-2xl font-bold sm:text-3xl">{lesson.title}</h1>
         {lesson.summary && <p className="mt-2 text-text-muted">{lesson.summary}</p>}
+        {lesson.availableFrom && lesson.availableFrom > new Date() && (
+          <p className="mt-2 flex items-center gap-1.5 text-xs text-text-dim">
+            <CalendarClock size={13} />
+            Доступно с{" "}
+            {lesson.availableFrom.toLocaleDateString("ru-RU", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </p>
+        )}
       </div>
 
       <VideoEmbed url={lesson.videoUrl} />

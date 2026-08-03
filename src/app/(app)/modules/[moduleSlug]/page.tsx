@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CheckCircle2, Circle, Clock, HelpCircle, ClipboardList } from "lucide-react";
+import { CheckCircle2, Circle, Clock, HelpCircle, ClipboardList, CalendarClock } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ModuleIcon } from "@/lib/module-icons";
@@ -76,8 +76,21 @@ export default async function ModulePage({
                 <Circle className="shrink-0 text-text-dim" size={22} />
               )}
               <div className="min-w-0 flex-1">
-                <p className="text-xs text-text-dim">Урок {i + 1}</p>
+                <p className="flex items-center gap-2 text-xs text-text-dim">
+                  <span>Урок {i + 1}</span>
+                  {lesson.format && <span className="badge !px-1.5 !py-0">{lesson.format}</span>}
+                </p>
                 <p className="truncate font-medium">{lesson.title}</p>
+                {lesson.availableFrom && lesson.availableFrom > new Date() && (
+                  <p className="mt-0.5 flex items-center gap-1 text-xs text-text-dim">
+                    <CalendarClock size={12} />
+                    Доступно с{" "}
+                    {lesson.availableFrom.toLocaleDateString("ru-RU", {
+                      day: "numeric",
+                      month: "long",
+                    })}
+                  </p>
+                )}
               </div>
               <div className="flex shrink-0 items-center gap-2 text-text-dim">
                 <span className="hidden items-center gap-1 text-xs sm:flex">

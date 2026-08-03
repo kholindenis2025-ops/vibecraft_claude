@@ -70,6 +70,8 @@ model Lesson {
   driveUrl    String?
   slidesUrl   String?
   durationMin Int     @default(10)
+  format      String?
+  availableFrom DateTime?
 
   progress LessonProgress[]
   quiz     Quiz?
