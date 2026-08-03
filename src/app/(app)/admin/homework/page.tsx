@@ -4,6 +4,7 @@ import { Clock, CheckCircle2, XCircle } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { HomeworkReviewForm } from "@/components/HomeworkReviewForm";
+import { Avatar } from "@/components/Avatar";
 
 const TABS = [
   { key: "PENDING", label: "На проверке" },
@@ -27,7 +28,7 @@ export default async function AdminHomeworkPage({
     where: { status: activeStatus },
     orderBy: { createdAt: "asc" },
     include: {
-      student: { select: { name: true, email: true, avatarEmoji: true } },
+      student: { select: { name: true, email: true } },
       homework: {
         include: { lesson: { include: { module: { select: { title: true } } } } },
       },
@@ -62,7 +63,7 @@ export default async function AdminHomeworkPage({
           <div key={s.id} className="card p-5">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <span className="text-xl">{s.student.avatarEmoji}</span>
+                <Avatar name={s.student.name} size={28} />
                 <div>
                   <p className="text-sm font-semibold">{s.student.name}</p>
                   <p className="text-xs text-text-dim">{s.student.email}</p>

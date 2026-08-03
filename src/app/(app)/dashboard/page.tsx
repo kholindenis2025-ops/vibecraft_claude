@@ -3,6 +3,7 @@ import { Trophy, Flame, CheckCircle2, ArrowRight, BookOpen } from "lucide-react"
 import { requireUser } from "@/lib/auth";
 import { getCourseSummary } from "@/lib/progress";
 import { prisma } from "@/lib/prisma";
+import { ModuleIcon } from "@/lib/module-icons";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -21,9 +22,7 @@ export default async function DashboardPage() {
     <div className="flex flex-col gap-8">
       <div>
         <span className="kicker">Дашборд</span>
-        <h1 className="mt-1 text-2xl font-bold sm:text-3xl">
-          Привет, {user.name} {user.avatarEmoji}
-        </h1>
+        <h1 className="mt-1 text-2xl font-bold sm:text-3xl">Привет, {user.name}</h1>
         <p className="mt-1 text-text-muted">Продолжай в том же темпе — ты уже неплохо продвинулся.</p>
       </div>
 
@@ -69,8 +68,8 @@ export default async function DashboardPage() {
           href={`/modules/${nextModule.slug}`}
           className="card card-hover flex items-center gap-4 p-5 sm:p-6"
         >
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-2xl">
-            {nextModule.icon}
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
+            <ModuleIcon iconKey={nextModule.icon} size={22} />
           </span>
           <div className="min-w-0 flex-1">
             <p className="flex items-center gap-1.5 text-xs font-semibold text-accent">

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { LoginForm } from "@/components/LoginForm";
+import { Logo } from "@/components/Logo";
 
 export default async function LoginPage() {
   const user = await getCurrentUser();
@@ -11,9 +12,7 @@ export default async function LoginPage() {
     <div className="flex min-h-screen items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
         <Link href="/" className="mb-8 flex items-center justify-center gap-2 font-extrabold tracking-tight">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-contrast">
-            ⚡
-          </span>
+          <Logo size={36} />
           VIBE<span className="text-accent">CRAFT</span>
         </Link>
         <div className="card p-6 sm:p-8">

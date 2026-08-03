@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { LayoutDashboard, BookOpen, Trophy, ClipboardCheck, LogOut } from "lucide-react";
 import { logoutAction } from "@/lib/actions/auth-actions";
+import { Logo } from "@/components/Logo";
+import { Avatar } from "@/components/Avatar";
 
 type Props = {
   user: {
     name: string;
     email: string;
-    avatarEmoji: string;
     role: "STUDENT" | "ADMIN";
   };
 };
@@ -16,9 +17,7 @@ export function SiteHeader({ user }: Props) {
     <header className="sticky top-0 z-30 border-b border-border bg-bg/85 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <Link href="/dashboard" className="flex items-center gap-2 font-extrabold tracking-tight">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-accent-contrast">
-            ⚡
-          </span>
+          <Logo size={32} />
           <span className="hidden sm:inline">
             VIBE<span className="text-accent">CRAFT</span>
           </span>
@@ -59,9 +58,7 @@ export function SiteHeader({ user }: Props) {
 
         <div className="flex items-center gap-3">
           <div className="hidden items-center gap-2 sm:flex">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-bg-soft text-base">
-              {user.avatarEmoji}
-            </span>
+            <Avatar name={user.name} size={32} />
             <span className="text-sm font-medium">{user.name}</span>
           </div>
           <form action={logoutAction}>

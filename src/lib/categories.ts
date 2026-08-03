@@ -2,12 +2,22 @@ export type ModuleCategory = "INTRO" | "MODULE" | "TOOL" | "BONUS" | "MATERIAL";
 
 export const CATEGORY_ORDER: ModuleCategory[] = ["INTRO", "MODULE", "TOOL", "BONUS", "MATERIAL"];
 
-export const CATEGORY_LABELS: Record<ModuleCategory, string> = {
+// Заголовок секции (множественное число)
+export const CATEGORY_SECTION_LABELS: Record<ModuleCategory, string> = {
+  INTRO: "Введение",
+  MODULE: "Модули",
+  TOOL: "Инструменты",
+  BONUS: "Бонусы",
+  MATERIAL: "Материалы",
+};
+
+// Метка на отдельной карточке (единственное число)
+export const CATEGORY_CARD_LABELS: Record<ModuleCategory, string> = {
   INTRO: "Введение",
   MODULE: "Модуль",
   TOOL: "Инструмент",
   BONUS: "Бонус",
-  MATERIAL: "Материалы",
+  MATERIAL: "Материал",
 };
 
 export const CATEGORY_DESCRIPTIONS: Record<ModuleCategory, string> = {
@@ -20,7 +30,7 @@ export const CATEGORY_DESCRIPTIONS: Record<ModuleCategory, string> = {
 
 export function categoryBadge(category: ModuleCategory, indexInCategory: number): string {
   if (category === "MODULE") return `Модуль ${indexInCategory}`;
-  return CATEGORY_LABELS[category];
+  return CATEGORY_CARD_LABELS[category];
 }
 
 export function groupByCategory<T extends { category: ModuleCategory }>(

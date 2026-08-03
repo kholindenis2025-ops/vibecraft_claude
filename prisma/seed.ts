@@ -65,7 +65,7 @@ const modules: ModuleDef[] = [
     title: "Топ-30 ошибок вайб-кодинга",
     description:
       "Чек-лист главных ошибок новичков в вайб-кодинге — чтобы не наступать на грабли, на которых уже все обожглись.",
-    icon: "🚫",
+    icon: "shield-alert",
     externalUrl: "https://platform.aibasis.ru/top-30-oshibok-vibe-coding#checklist",
     lessons: [
       {
@@ -184,7 +184,7 @@ const modules: ModuleDef[] = [
     category: "INTRO",
     title: "Подготовка к обучению и мотивация",
     description: "Настраиваемся на курс, разбираемся с инструментами и формулируем свою личную цель.",
-    icon: "🔥",
+    icon: "compass",
     lessons: [
       { slug: "kak-ustroen-kurs", title: "Как устроен этот курс и что тебя ждёт", summary: "Структура курса, модули и формат обучения.", content: placeholderContent("Как устроен этот курс") },
       { slug: "zachem-tebe-vibe-coding", title: "Зачем тебе вайб-кодинг: три сценария применения", summary: "Для чего вайб-кодинг нужен лично тебе — карьера, свой продукт или хобби.", content: placeholderContent("Зачем тебе вайб-кодинг") },
@@ -230,7 +230,7 @@ const modules: ModuleDef[] = [
     category: "MODULE",
     title: "Модуль 1. С чего начать: твоя идея и первый продукт",
     description: "От идеи до первого работающего прототипа продукта.",
-    icon: "💡",
+    icon: "lightbulb",
     lessons: [
       { slug: "otkuda-brat-idei", title: "Откуда брать идеи для продукта", summary: "Источники идей и как отличить хорошую идею от пустой.", content: placeholderContent("Откуда брать идеи для продукта") },
       { slug: "kak-proverit-ideyu", title: "Как проверить идею за один день", summary: "Быстрые способы валидации идеи без разработки.", content: placeholderContent("Проверка идеи за один день") },
@@ -261,7 +261,7 @@ const modules: ModuleDef[] = [
     category: "MODULE",
     title: "Модуль 2. Тренд-радар: собираешь на самом свежем",
     description: "Учимся находить свежие идеи и тренды и превращать их в продукты.",
-    icon: "📡",
+    icon: "radar",
     lessons: [
       { slug: "zachem-sledit-za-trendami", title: "Зачем следить за трендами в ИИ-инструментах", summary: "Почему актуальность инструментов даёт конкурентное преимущество.", content: placeholderContent("Зачем следить за трендами") },
       { slug: "gde-iskat-idei", title: "Где искать свежие идеи и кейсы", summary: "Источники вдохновения и разбора чужих кейсов.", content: placeholderContent("Где искать свежие идеи") },
@@ -291,7 +291,7 @@ const modules: ModuleDef[] = [
     category: "MODULE",
     title: "Модуль 3. Твои первые продукты: от А до Я",
     description: "Полный цикл создания продукта — от технического задания до готового результата.",
-    icon: "🧩",
+    icon: "layout-grid",
     lessons: [
       { slug: "struktura-prostogo-produkta", title: "Структура простого продукта на ИИ", summary: "Из каких частей состоит типичный продукт.", content: placeholderContent("Структура простого продукта") },
       { slug: "ot-idei-k-tz", title: "От идеи к техническому заданию", summary: "Как оформить идею в понятное для ИИ техническое задание.", content: placeholderContent("От идеи к техническому заданию") },
@@ -324,7 +324,7 @@ const modules: ModuleDef[] = [
     category: "MODULE",
     title: "Модуль 4. От черновика до продукта в интернете",
     description: "Публикуем продукт в интернете: хостинг, домен, безопасность, аналитика и мониторинг.",
-    icon: "🌐",
+    icon: "globe",
     lessons: [
       { slug: "chto-nuzhno-chtoby-uvidel-svet", title: "Что нужно, чтобы продукт увидел свет", summary: "Чек-лист готовности к публикации.", content: placeholderContent("Что нужно для публикации продукта") },
       { slug: "vybor-hostinga", title: "Выбираем хостинг для своего проекта", summary: "Сравнение вариантов размещения продукта.", content: placeholderContent("Выбор хостинга") },
@@ -363,7 +363,7 @@ const modules: ModuleDef[] = [
     category: "MODULE",
     title: "Модуль 5. Первые клиенты и деньги",
     description: "От первого продукта — к первым деньгам: поиск клиентов, продажи, оплата.",
-    icon: "💰",
+    icon: "handshake",
     lessons: [
       { slug: "kto-tvoy-pervyi-klient", title: "Кто твой первый клиент и где его искать", summary: "Как определить и найти первую аудиторию.", content: placeholderContent("Кто твой первый клиент") },
       { slug: "kak-rasskazat-o-produkte", title: "Как рассказать о продукте, если ты не маркетолог", summary: "Простые способы рассказать о продукте без опыта в маркетинге.", content: placeholderContent("Как рассказать о продукте") },
@@ -393,7 +393,7 @@ const modules: ModuleDef[] = [
     category: "MODULE",
     title: "Модуль 6. Спринт: 10 дней до первого клиента",
     description: "Интенсивный практический спринт: за 10 дней проходим путь от идеи до первой сделки.",
-    icon: "🏁",
+    icon: "flag",
     lessons: [
       { slug: "den-0-plan-sprinta", title: "День 0: готовим план спринта", summary: "Формируем чёткий план на все 10 дней.", content: placeholderContent("День 0: план спринта") },
       { slug: "den-1-2-nisha-i-offer", title: "День 1-2: выбираем нишу и оффер", summary: "Определяем нишу и формулируем предложение.", content: placeholderContent("День 1-2: ниша и оффер") },
@@ -430,7 +430,7 @@ const modules: ModuleDef[] = [
     category: "TOOL",
     title: "Карта скиллов для Codex",
     description: "Разбираемся, какие навыки (скиллы) можно прокачать у Codex и как ими пользоваться.",
-    icon: "🗺️",
+    icon: "map",
     externalUrl: "https://platform.aibasis.ru/codex_skills_map",
     lessons: [
       { slug: "chto-takoe-codex-skills", title: "Что такое Codex и зачем ему навыки (skills)", summary: "Базовое понимание скиллов в Codex.", content: placeholderContent("Что такое Codex и его скиллы") },
@@ -457,7 +457,7 @@ const modules: ModuleDef[] = [
     category: "TOOL",
     title: "Скиллы для Claude Code и Codex",
     description: "Стартовый набор готовых скиллов для Claude Code и Codex — устанавливаем и адаптируем под себя.",
-    icon: "🧰",
+    icon: "wrench",
     externalUrl: "https://platform.aibasis.ru/skills-starter-kit",
     lessons: [
       { slug: "chem-otlichayutsya-skilly", title: "Чем отличаются скиллы Claude Code и Codex", summary: "Сравниваем подходы к скиллам в двух инструментах.", content: placeholderContent("Скиллы Claude Code и Codex") },
@@ -484,7 +484,7 @@ const modules: ModuleDef[] = [
     category: "TOOL",
     title: "Claude и Codex на 80% дешевле",
     description: "Разбираемся, как экономить на работе с ИИ-агентами без потери качества.",
-    icon: "💸",
+    icon: "piggy-bank",
     externalUrl: "https://platform.aibasis.ru/ClaudeCodex_deshevle",
     lessons: [
       { slug: "iz-chego-skladyvaetsya-stoimost", title: "Из чего складывается стоимость работы с ИИ-агентами", summary: "Разбираем, за что именно платим при работе с ИИ.", content: placeholderContent("Из чего складывается стоимость ИИ") },
@@ -510,7 +510,7 @@ const modules: ModuleDef[] = [
     category: "TOOL",
     title: "Скиллы для твоего агента",
     description: "Проектируем и подключаем собственные скиллы под рутинные задачи твоего агента.",
-    icon: "🤖",
+    icon: "bot",
     externalUrl: "https://platform.aibasis.ru/skills-start",
     lessons: [
       { slug: "zachem-agentu-skilly", title: "Зачем агенту собственные скиллы", summary: "Понимаем ценность кастомных скиллов для агента.", content: placeholderContent("Зачем агенту собственные скиллы") },
@@ -537,7 +537,7 @@ const modules: ModuleDef[] = [
     category: "BONUS",
     title: "Бонус: Вайбкодинг с телефона",
     description: "Помощник прямо в Telegram: правишь свой продукт удалённо, без компьютера, с пляжа или кафе.",
-    icon: "📱",
+    icon: "smartphone",
     lessons: [
       { slug: "telefon-kak-rabochiy-instrument", title: "Как превратить телефон в рабочий инструмент", summary: "Настраиваем телефон для полноценной работы над продуктом.", content: placeholderContent("Телефон как рабочий инструмент") },
       { slug: "pomoshnik-v-telegram", title: "Приложение-помощник в Telegram: обзор", summary: "Разбираем возможности Telegram-помощника для вайб-кодинга.", content: placeholderContent("Помощник в Telegram") },
@@ -560,7 +560,7 @@ const modules: ModuleDef[] = [
     category: "MATERIAL",
     title: "Полезные доп. материалы и статьи",
     description: "Подборка статей, промптов и источников вдохновения для дальнейшего развития.",
-    icon: "📚",
+    icon: "library",
     lessons: [
       { slug: "podborka-statey", title: "Подборка статей по вайб-кодингу", summary: "Список статей для углублённого изучения темы.", content: placeholderContent("Подборка статей по вайб-кодингу") },
       { slug: "biblioteka-promptov", title: "Библиотека промптов на все случаи", summary: "Набор готовых промптов под разные задачи.", content: placeholderContent("Библиотека промптов") },
@@ -668,7 +668,6 @@ async function main() {
         passwordHash,
         name: "Куратор курса",
         role: "ADMIN",
-        avatarEmoji: "🧑‍🏫",
       },
     });
     console.log(`Админ создан: ${adminEmail} / admin12345 (смените пароль в проде)`);

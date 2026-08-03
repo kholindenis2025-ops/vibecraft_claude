@@ -34,7 +34,6 @@ model User {
   passwordHash String
   name         String
   role         Role     @default(STUDENT)
-  avatarEmoji  String   @default("🚀")
   createdAt    DateTime @default(now())
 
   lessonProgress   LessonProgress[]
@@ -51,7 +50,7 @@ model Module {
   category    ModuleCategory @default(MODULE)
   title       String
   description String
-  icon        String         @default("📦")
+  icon        String         @default("compass")
   externalUrl String?
   createdAt   DateTime       @default(now())
 
@@ -156,7 +155,7 @@ model Achievement {
   code        String @unique
   title       String
   description String
-  icon        String @default("🏆")
+  icon        String @default("trophy")
 
   users UserAchievement[]
 }

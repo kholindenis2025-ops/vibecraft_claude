@@ -18,8 +18,13 @@ export function HomeworkReviewForm({ submissionId }: { submissionId: string }) {
 
   if (done) {
     return (
-      <p className={`text-sm font-semibold ${done === "APPROVED" ? "text-accent" : "text-danger"}`}>
-        {done === "APPROVED" ? "Принято ✓" : "Отклонено"}
+      <p
+        className={`flex items-center gap-1.5 text-sm font-semibold ${
+          done === "APPROVED" ? "text-accent" : "text-danger"
+        }`}
+      >
+        {done === "APPROVED" ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
+        {done === "APPROVED" ? "Принято" : "Отклонено"}
       </p>
     );
   }

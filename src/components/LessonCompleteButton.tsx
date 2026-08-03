@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { CheckCircle2, Circle, PartyPopper } from "lucide-react";
+import { CheckCircle2, Circle, Award } from "lucide-react";
 import { setLessonCompleted } from "@/lib/actions/progress-actions";
+import { AchievementIcon } from "@/lib/achievement-icons";
 
 type Props = {
   lessonId: string;
@@ -42,11 +43,11 @@ export function LessonCompleteButton({ lessonId, initialCompleted, modulePath, l
       {unlocked.length > 0 && (
         <div className="absolute right-0 top-full z-10 mt-2 w-64 rounded-xl border border-accent/40 bg-card p-3 shadow-lg">
           <p className="mb-1 flex items-center gap-1.5 text-xs font-bold text-accent">
-            <PartyPopper size={14} /> Новое достижение!
+            <Award size={14} /> Новое достижение!
           </p>
           {unlocked.map((a) => (
-            <p key={a.title} className="text-sm">
-              {a.icon} {a.title}
+            <p key={a.title} className="flex items-center gap-1.5 text-sm">
+              <AchievementIcon iconKey={a.icon} size={14} className="text-accent" /> {a.title}
             </p>
           ))}
         </div>

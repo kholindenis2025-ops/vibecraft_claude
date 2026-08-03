@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { CheckCircle2, XCircle, HelpCircle, PartyPopper } from "lucide-react";
+import { CheckCircle2, XCircle, HelpCircle, Award, Lightbulb } from "lucide-react";
 import { submitQuizAttempt, type QuizResult } from "@/lib/actions/quiz-actions";
 
 type Question = { id: string; text: string; options: string[] };
@@ -84,7 +84,10 @@ export function QuizBlock({ quizId, title, passScore, questions, modulePath, les
                 })}
               </div>
               {result && questionResult && !questionResult.wasCorrect && questionResult.explanation && (
-                <p className="mt-2 text-xs text-text-muted">💡 {questionResult.explanation}</p>
+                <p className="mt-2 flex items-start gap-1.5 text-xs text-text-muted">
+                  <Lightbulb size={14} className="mt-0.5 shrink-0 text-accent" />
+                  {questionResult.explanation}
+                </p>
               )}
             </div>
           );
@@ -108,8 +111,11 @@ export function QuizBlock({ quizId, title, passScore, questions, modulePath, les
                 : "border-warning/40 bg-warning/10 text-warning"
             }`}
           >
-            {result.passed ? "✅ Тест сдан" : "Пока не сдано"} · {result.score}% (
-            {result.correctCount}/{result.totalCount}), нужно {passScore}%+
+            <span className="inline-flex items-center gap-1.5">
+              {result.passed && <CheckCircle2 size={16} />}
+              {result.passed ? "Тест сдан" : "Пока не сдано"}
+            </span>{" "}
+            · {result.score}% ({result.correctCount}/{result.totalCount}), нужно {passScore}%+
           </div>
           {!result.passed && (
             <button onClick={retry} className="btn-secondary">
@@ -118,7 +124,7 @@ export function QuizBlock({ quizId, title, passScore, questions, modulePath, les
           )}
           {result.unlocked.length > 0 && (
             <div className="flex items-center gap-1.5 text-sm font-medium text-accent">
-              <PartyPopper size={16} /> {result.unlocked.map((a) => a.title).join(", ")}
+              <Award size={16} /> {result.unlocked.map((a) => a.title).join(", ")}
             </div>
           )}
         </div>

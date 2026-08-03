@@ -11,7 +11,9 @@ import {
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { CATEGORY_LABELS, categoryBadge, groupByCategory } from "@/lib/categories";
+import { CATEGORY_SECTION_LABELS, categoryBadge, groupByCategory } from "@/lib/categories";
+import { ModuleIcon } from "@/lib/module-icons";
+import { Logo } from "@/components/Logo";
 
 export default async function HomePage() {
   const user = await getCurrentUser();
@@ -37,9 +39,7 @@ export default async function HomePage() {
     <div className="flex min-h-screen flex-col">
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-6 sm:px-6">
         <div className="flex items-center gap-2 font-extrabold tracking-tight">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-contrast">
-            ⚡
-          </span>
+          <Logo size={36} />
           VIBE<span className="text-accent">CRAFT</span>
         </div>
         <div className="flex items-center gap-2">
@@ -112,12 +112,16 @@ export default async function HomePage() {
         <div className="flex flex-col gap-8">
           {groups.map((group) => (
             <div key={group.category}>
-              <span className="badge-accent mb-3 inline-flex">{CATEGORY_LABELS[group.category]}</span>
+              <span className="badge-accent mb-3 inline-flex">
+                {CATEGORY_SECTION_LABELS[group.category]}
+              </span>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {group.items.map((m, i) => (
                   <div key={m.slug} className="card card-hover p-5">
                     <div className="mb-3 flex items-center gap-3">
-                      <span className="text-2xl">{m.icon}</span>
+                      <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-soft text-accent">
+                        <ModuleIcon iconKey={m.icon} size={20} />
+                      </span>
                       <span className="badge">{categoryBadge(group.category, i + 1)}</span>
                       <span className="ml-auto text-xs text-text-dim">{m.lessons.length} уроков</span>
                     </div>

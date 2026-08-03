@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { CheckCircle2, Circle, Clock, HelpCircle, ClipboardList } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { ModuleIcon } from "@/lib/module-icons";
 
 export default async function ModulePage({
   params,
@@ -42,8 +43,8 @@ export default async function ModulePage({
 
       <div className="card p-6 sm:p-8">
         <div className="flex items-start gap-4">
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-accent-soft text-3xl">
-            {mod.icon}
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-accent-soft text-accent">
+            <ModuleIcon iconKey={mod.icon} size={28} />
           </span>
           <div className="min-w-0 flex-1">
             <h1 className="text-xl font-bold sm:text-2xl">{mod.title}</h1>

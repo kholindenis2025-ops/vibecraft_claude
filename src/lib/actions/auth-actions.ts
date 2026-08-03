@@ -38,11 +38,9 @@ export async function registerAction(
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const avatarEmojis = ["🚀", "🦾", "🧠", "⚡", "🔥", "🌱", "🎯", "🛠️"];
-  const avatarEmoji = avatarEmojis[Math.floor(Math.random() * avatarEmojis.length)];
 
   const user = await prisma.user.create({
-    data: { name, email, passwordHash, avatarEmoji },
+    data: { name, email, passwordHash },
   });
 
   await createSession({ userId: user.id, role: user.role });

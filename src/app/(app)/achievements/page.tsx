@@ -1,6 +1,7 @@
 import { Lock } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { AchievementIcon } from "@/lib/achievement-icons";
 
 export default async function AchievementsPage() {
   const user = await requireUser();
@@ -35,11 +36,15 @@ export default async function AchievementsPage() {
               className={`card flex items-start gap-4 p-5 ${!isUnlocked ? "opacity-50" : ""}`}
             >
               <span
-                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-2xl ${
-                  isUnlocked ? "bg-accent-soft" : "bg-bg-soft grayscale"
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${
+                  isUnlocked ? "bg-accent-soft text-accent" : "bg-bg-soft"
                 }`}
               >
-                {isUnlocked ? a.icon : <Lock size={20} className="text-text-dim" />}
+                {isUnlocked ? (
+                  <AchievementIcon iconKey={a.icon} size={22} />
+                ) : (
+                  <Lock size={20} className="text-text-dim" />
+                )}
               </span>
               <div className="min-w-0">
                 <p className="font-bold">{a.title}</p>
