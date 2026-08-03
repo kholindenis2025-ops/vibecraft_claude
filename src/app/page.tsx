@@ -95,7 +95,7 @@ export default async function HomePage() {
           <div>
             <span className="kicker">Программа курса</span>
             <h2 className="mt-2 text-2xl font-bold sm:text-3xl">
-              {modules.length} модулей — от идеи до денег
+              {modules.length} модулей — от идеи до дохода
             </h2>
           </div>
         </div>
