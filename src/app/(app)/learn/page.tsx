@@ -9,6 +9,7 @@ import {
   groupByCategory,
 } from "@/lib/categories";
 import { ModuleIcon } from "@/lib/module-icons";
+import { lessonsWord } from "@/lib/plural";
 
 export default async function LearnPage() {
   const user = await requireUser();
@@ -53,7 +54,8 @@ export default async function LearnPage() {
                   <div className="progress-fill" style={{ width: `${m.percent}%` }} />
                 </div>
                 <p className="mt-2 text-xs text-text-dim">
-                  {m.completedLessons} / {m.totalLessons} уроков · {m.percent}%
+                  {m.completedLessons} / {m.totalLessons} {lessonsWord(m.totalLessons)} ·{" "}
+                  {m.percent}%
                 </p>
               </Link>
             ))}

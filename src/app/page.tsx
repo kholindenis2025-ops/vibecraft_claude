@@ -14,6 +14,7 @@ import { prisma } from "@/lib/prisma";
 import { CATEGORY_SECTION_LABELS, categoryBadge, groupByCategory } from "@/lib/categories";
 import { ModuleIcon } from "@/lib/module-icons";
 import { Logo } from "@/components/Logo";
+import { lessonsWord } from "@/lib/plural";
 
 export default async function HomePage() {
   const user = await getCurrentUser();
@@ -70,7 +71,8 @@ export default async function HomePage() {
         <p className="max-w-xl text-lg text-text-muted">
           Создавай реальные продукты с помощью ИИ — даже если раньше никогда не программировал.{" "}
           {coreModuleCount} модулей от идеи до дохода, плюс инструментарий, бонусы и материалы —{" "}
-          {totalLessons} уроков, тесты, домашние задания с проверкой, прогресс и достижения.
+          {totalLessons} {lessonsWord(totalLessons)}, тесты, домашние задания с проверкой,
+          прогресс и достижения.
         </p>
         <div className="flex flex-wrap items-center gap-3">
           <Link href={ctaHref} className="btn-primary text-base">
@@ -123,7 +125,9 @@ export default async function HomePage() {
                         <ModuleIcon iconKey={m.icon} size={20} />
                       </span>
                       <span className="badge">{categoryBadge(group.category, i + 1)}</span>
-                      <span className="ml-auto text-xs text-text-dim">{m.lessons.length} уроков</span>
+                      <span className="ml-auto text-xs text-text-dim">
+                        {m.lessons.length} {lessonsWord(m.lessons.length)}
+                      </span>
                     </div>
                     <h3 className="mb-1.5 font-bold leading-snug">{m.title}</h3>
                     <p className="text-sm text-text-muted">{m.description}</p>

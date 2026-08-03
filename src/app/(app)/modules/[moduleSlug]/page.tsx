@@ -4,6 +4,7 @@ import { CheckCircle2, Circle, Clock, HelpCircle, ClipboardList, CalendarClock }
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ModuleIcon } from "@/lib/module-icons";
+import { lessonsWord } from "@/lib/plural";
 
 export default async function ModulePage({
   params,
@@ -56,7 +57,7 @@ export default async function ModulePage({
             <div className="progress-fill" style={{ width: `${percent}%` }} />
           </div>
           <p className="mt-2 text-xs text-text-dim">
-            {completed} из {total} уроков пройдено · {percent}%
+            {completed} из {total} {lessonsWord(total)} пройдено · {percent}%
           </p>
         </div>
       </div>

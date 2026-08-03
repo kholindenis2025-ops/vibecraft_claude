@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth";
 import { getCourseSummary } from "@/lib/progress";
 import { prisma } from "@/lib/prisma";
 import { ModuleIcon } from "@/lib/module-icons";
+import { lessonsWord } from "@/lib/plural";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -36,7 +37,7 @@ export default async function DashboardPage() {
             <div className="progress-fill" style={{ width: `${summary.percent}%` }} />
           </div>
           <p className="mt-2 text-xs text-text-dim">
-            {summary.completedLessons} из {summary.totalLessons} уроков
+            {summary.completedLessons} из {summary.totalLessons} {lessonsWord(summary.totalLessons)}
           </p>
         </div>
 
@@ -77,7 +78,8 @@ export default async function DashboardPage() {
             </p>
             <p className="truncate font-bold">{nextModule.title}</p>
             <p className="text-sm text-text-muted">
-              {nextModule.completedLessons} из {nextModule.totalLessons} уроков пройдено
+              {nextModule.completedLessons} из {nextModule.totalLessons}{" "}
+              {lessonsWord(nextModule.totalLessons)} пройдено
             </p>
           </div>
           <ArrowRight className="shrink-0 text-text-dim" size={20} />
