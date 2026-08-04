@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { PlayCircle, Presentation, Link2, Download, AlertTriangle } from "lucide-react";
 import { toEmbedUrl } from "@/lib/media";
-import { isYandexDiskUrl } from "@/lib/yandex-disk";
 
 export function VideoEmbed({ url, directSrc }: { url?: string | null; directSrc?: string | null }) {
   const [playbackFailed, setPlaybackFailed] = useState(false);
@@ -17,7 +16,7 @@ export function VideoEmbed({ url, directSrc }: { url?: string | null; directSrc?
     );
   }
 
-  const unavailable = (directSrc && playbackFailed) || (!directSrc && isYandexDiskUrl(url));
+  const unavailable = directSrc && playbackFailed;
 
   if (unavailable) {
     return (
@@ -69,7 +68,7 @@ export function VideoEmbed({ url, directSrc }: { url?: string | null; directSrc?
   );
 }
 
-export function SlidesEmbed({ url }: { url?: string | null }) {
+export function SlidesEmbed({ url, directSrc }: { url?: string | null; directSrc?: string | null }) {
   if (!url) {
     return (
       <div className="flex aspect-video flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border-strong bg-bg-soft text-text-dim">
@@ -80,8 +79,20 @@ export function SlidesEmbed({ url }: { url?: string | null }) {
   }
 
   return (
-    <div className="aspect-video overflow-hidden rounded-xl border border-border">
-      <iframe src={toEmbedUrl(url)} className="h-full w-full" allowFullScreen />
+    <div className="flex flex-col gap-2">
+      <div className="aspect-video overflow-hidden rounded-xl border border-border">
+        <iframe src={directSrc ?? toEmbedUrl(url)} className="h-full w-full" allowFullScreen />
+      </div>
+      {directSrc && (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 self-start text-xs text-text-dim hover:text-accent"
+        >
+          <Download size={13} /> Скачать презентацию
+        </a>
+      )}
     </div>
   );
 }

@@ -10,6 +10,21 @@ export function isDirectVideoUrl(url: string): boolean {
   }
 }
 
+// True for any URL that needs to go through our /api/slides proxy rather
+// than being iframed directly — i.e. a raw file (our own Blob uploads),
+// as opposed to a hosted viewer page (Drive/Slides) that has to stay on
+// the provider's own domain since it's an interactive page, not bytes.
+export function isProxiedSlideUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    return (
+      !u.hostname.includes("drive.google.com") && !u.hostname.includes("docs.google.com")
+    );
+  } catch {
+    return false;
+  }
+}
+
 export function toEmbedUrl(url: string): string {
   try {
     const u = new URL(url);

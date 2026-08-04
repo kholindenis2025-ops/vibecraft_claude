@@ -2,12 +2,14 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { resolveYandexDiskDirectUrl } from "@/lib/yandex-disk";
+import { isYandexDiskUrl } from "@/lib/yandex-disk";
 
 // Streams a lesson video through our own origin instead of handing the
-// client a Yandex-signed URL directly. Yandex's signed download links can
-// fail to play when fetched from a different network context than the one
-// that requested them (or transiently from certain hosting IP ranges), so
-// resolving AND fetching from the same place (this server) sidesteps that.
+// browser a third-party URL directly (Yandex signed link or a
+// blob.vercel-storage.com URL). Several of those hosting domains are
+// unreliable or blocked outright for Russian viewers without a VPN, while
+// our own app domain isn't — so every video request goes through here
+// regardless of where the file actually lives.
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ videoId: string }> }
@@ -22,7 +24,9 @@ export async function GET(
   });
   if (!video) return new Response("Not found", { status: 404 });
 
-  const directUrl = await resolveYandexDiskDirectUrl(video.url);
+  const directUrl = isYandexDiskUrl(video.url)
+    ? await resolveYandexDiskDirectUrl(video.url)
+    : video.url;
   if (!directUrl) return new Response("Video source unavailable", { status: 502 });
 
   const range = req.headers.get("range");

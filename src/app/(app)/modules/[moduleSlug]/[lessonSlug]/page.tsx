@@ -5,8 +5,7 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { LessonContent } from "@/components/LessonContent";
 import { VideoEmbed, SlidesEmbed, ResourceLinks } from "@/components/MediaEmbed";
-import { isYandexDiskUrl } from "@/lib/yandex-disk";
-import { isDirectVideoUrl } from "@/lib/media";
+import { isProxiedSlideUrl } from "@/lib/media";
 import { LessonCompleteButton } from "@/components/LessonCompleteButton";
 import { QuizBlock } from "@/components/QuizBlock";
 import { HomeworkForm } from "@/components/HomeworkForm";
@@ -57,10 +56,15 @@ export default async function LessonPage({
   const prevLesson = index > 0 ? mod.lessons[index - 1] : null;
   const nextLesson = index < mod.lessons.length - 1 ? mod.lessons[index + 1] : null;
 
-  function videoDirectSrc(video: { id: string; url: string }): string | null {
-    if (isYandexDiskUrl(video.url)) return `/api/video/${video.id}`;
-    if (isDirectVideoUrl(video.url)) return video.url;
-    return null;
+  // Always proxy through our own domain — never hand the browser a
+  // third-party URL directly, since hosting domains like Yandex Disk or
+  // blob.vercel-storage.com aren't reliably reachable in Russia without a VPN.
+  function videoDirectSrc(video: { id: string }): string {
+    return `/api/video/${video.id}`;
+  }
+
+  function slideDirectSrc(slide: { id: string; url: string }): string | null {
+    return isProxiedSlideUrl(slide.url) ? `/api/slides/${slide.id}` : null;
   }
 
   const lastSubmission = lesson.homework?.submissions[0]
@@ -130,7 +134,7 @@ export default async function LessonPage({
           <h2 className="mb-3 font-bold">
             {slide.title || (lesson.slides.length > 1 ? `Презентация ${i + 1}` : "Презентация")}
           </h2>
-          <SlidesEmbed url={slide.url} />
+          <SlidesEmbed url={slide.url} directSrc={slideDirectSrc(slide)} />
         </div>
       ))}
 
