@@ -1,3 +1,15 @@
+// A URL that points straight at a playable video file (e.g. our own Vercel
+// Blob uploads) rather than a page that needs an iframe embed.
+export function isDirectVideoUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    if (u.hostname.endsWith("public.blob.vercel-storage.com")) return true;
+    return /\.(mp4|webm|mov|m4v)$/i.test(u.pathname);
+  } catch {
+    return false;
+  }
+}
+
 export function toEmbedUrl(url: string): string {
   try {
     const u = new URL(url);

@@ -4,8 +4,9 @@ import { ChevronLeft, ChevronRight, Clock, CalendarClock } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { LessonContent } from "@/components/LessonContent";
-import { VideoEmbed, SlidesEmbed, DriveLink } from "@/components/MediaEmbed";
+import { VideoEmbed, SlidesEmbed, ResourceLinks } from "@/components/MediaEmbed";
 import { isYandexDiskUrl } from "@/lib/yandex-disk";
+import { isDirectVideoUrl } from "@/lib/media";
 import { LessonCompleteButton } from "@/components/LessonCompleteButton";
 import { QuizBlock } from "@/components/QuizBlock";
 import { HomeworkForm } from "@/components/HomeworkForm";
@@ -31,6 +32,7 @@ export default async function LessonPage({
       progress: { where: { userId: user.id } },
       quiz: { include: { questions: { orderBy: { order: "asc" } } } },
       terms: { orderBy: { order: "asc" } },
+      resources: { orderBy: { order: "asc" } },
       homework: {
         include: {
           submissions: {
@@ -53,8 +55,13 @@ export default async function LessonPage({
   const prevLesson = index > 0 ? mod.lessons[index - 1] : null;
   const nextLesson = index < mod.lessons.length - 1 ? mod.lessons[index + 1] : null;
 
-  const videoDirectSrc =
-    lesson.videoUrl && isYandexDiskUrl(lesson.videoUrl) ? `/api/video/${lesson.id}` : null;
+  const videoDirectSrc = !lesson.videoUrl
+    ? null
+    : isYandexDiskUrl(lesson.videoUrl)
+      ? `/api/video/${lesson.id}`
+      : isDirectVideoUrl(lesson.videoUrl)
+        ? lesson.videoUrl
+        : null;
 
   const lastSubmission = lesson.homework?.submissions[0]
     ? {
@@ -114,11 +121,7 @@ export default async function LessonPage({
         </div>
       )}
 
-      {lesson.driveUrl && (
-        <div>
-          <DriveLink url={lesson.driveUrl} />
-        </div>
-      )}
+      {lesson.resources.length > 0 && <ResourceLinks resources={lesson.resources} />}
 
       <div className="flex items-center justify-between border-t border-border pt-6">
         <LessonCompleteButton

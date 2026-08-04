@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, BookOpen, Trophy, ClipboardCheck, Users, LogOut } from "lucide-react";
+import { LayoutDashboard, BookOpen, Trophy, ClipboardCheck, Users, FileEdit, LogOut } from "lucide-react";
 import { logoutAction } from "@/lib/actions/auth-actions";
 import { Logo } from "@/components/Logo";
 import { Avatar } from "@/components/Avatar";
@@ -62,6 +62,15 @@ export function SiteHeader({ user }: Props) {
                 <span className="hidden lg:inline">Пользователи</span>
               </Link>
             </>
+          )}
+          {user.role === "ADMIN" && (
+            <Link
+              href="/admin/content"
+              className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
+            >
+              <FileEdit size={16} />
+              <span className="hidden lg:inline">Материалы</span>
+            </Link>
           )}
         </nav>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PlayCircle, Presentation, FolderOpen, Download, AlertTriangle } from "lucide-react";
+import { PlayCircle, Presentation, Link2, Download, AlertTriangle } from "lucide-react";
 import { toEmbedUrl } from "@/lib/media";
 import { isYandexDiskUrl } from "@/lib/yandex-disk";
 
@@ -86,16 +86,21 @@ export function SlidesEmbed({ url }: { url?: string | null }) {
   );
 }
 
-export function DriveLink({ url }: { url?: string | null }) {
-  if (!url) return null;
+export function ResourceLinks({ resources }: { resources: { id: string; title: string; url: string }[] }) {
+  if (resources.length === 0) return null;
   return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="badge-accent hover:bg-accent/20"
-    >
-      <FolderOpen size={13} /> Материалы на Google Диске
-    </a>
+    <div className="flex flex-wrap gap-2">
+      {resources.map((r) => (
+        <a
+          key={r.id}
+          href={r.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="badge-accent hover:bg-accent/20"
+        >
+          <Link2 size={13} /> {r.title}
+        </a>
+      ))}
+    </div>
   );
 }

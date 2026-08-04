@@ -30,6 +30,11 @@ type TermDef = {
   definition: string;
 };
 
+type ResourceDef = {
+  title: string;
+  url: string;
+};
+
 type LessonDef = {
   slug: string;
   title: string;
@@ -40,10 +45,10 @@ type LessonDef = {
   availableFrom?: string;
   videoUrl?: string;
   slidesUrl?: string;
-  driveUrl?: string;
   quiz?: QuizDef;
   homework?: HomeworkDef;
   terms?: TermDef[];
+  resources?: ResourceDef[];
 };
 
 type ModuleCategory = "INTRO" | "MODULE" | "TOOL" | "BONUS" | "MATERIAL";
@@ -81,10 +86,10 @@ function lesson(opts: {
   durationMin?: number;
   videoUrl?: string;
   slidesUrl?: string;
-  driveUrl?: string;
   quiz?: QuizDef;
   homework?: HomeworkDef;
   terms?: TermDef[];
+  resources?: ResourceDef[];
 }): LessonDef {
   return {
     slug: opts.slug,
@@ -96,10 +101,10 @@ function lesson(opts: {
     durationMin: opts.durationMin,
     videoUrl: opts.videoUrl,
     slidesUrl: opts.slidesUrl,
-    driveUrl: opts.driveUrl,
     quiz: opts.quiz,
     homework: opts.homework,
     terms: opts.terms,
+    resources: opts.resources,
   };
 }
 
@@ -979,7 +984,6 @@ async function main() {
           availableFrom,
           videoUrl: l.videoUrl ?? null,
           slidesUrl: l.slidesUrl ?? null,
-          driveUrl: l.driveUrl ?? null,
         },
         create: {
           moduleId: moduleRow.id,
@@ -993,7 +997,6 @@ async function main() {
           availableFrom,
           videoUrl: l.videoUrl ?? null,
           slidesUrl: l.slidesUrl ?? null,
-          driveUrl: l.driveUrl ?? null,
         },
       });
 
@@ -1031,6 +1034,21 @@ async function main() {
               order: t + 1,
               term: term.term,
               definition: term.definition,
+            },
+          });
+        }
+      }
+
+      await prisma.lessonResource.deleteMany({ where: { lessonId: lesson.id } });
+      if (l.resources) {
+        for (let r = 0; r < l.resources.length; r++) {
+          const resource = l.resources[r];
+          await prisma.lessonResource.create({
+            data: {
+              lessonId: lesson.id,
+              order: r + 1,
+              title: resource.title,
+              url: resource.url,
             },
           });
         }
