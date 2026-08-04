@@ -66,6 +66,7 @@ export function MediaListEditor({
       const blob = await upload(file.name, file, {
         access: "public",
         handleUploadUrl: "/api/lesson-upload",
+        multipart: true,
         onUploadProgress: (event) => {
           setRows((prev) =>
             prev.map((r) => (r.key === key ? { ...r, progress: event.percentage } : r))

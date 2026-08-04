@@ -16,6 +16,9 @@ export async function POST(request: Request): Promise<NextResponse> {
           addRandomSuffix: true,
           // Lesson videos can be very large (1GB+ recordings).
           maximumSizeInBytes: 5 * 1024 * 1024 * 1024,
+          // A multi-GB upload on a slow connection can take a while —
+          // the default 1-hour token would expire mid-upload and abort it.
+          validUntil: Date.now() + 6 * 60 * 60 * 1000,
         };
       },
       onUploadCompleted: async () => {},
