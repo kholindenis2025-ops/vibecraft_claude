@@ -1,12 +1,20 @@
 import { PlayCircle, Presentation, FolderOpen } from "lucide-react";
 import { toEmbedUrl } from "@/lib/media";
 
-export function VideoEmbed({ url }: { url?: string | null }) {
+export function VideoEmbed({ url, directSrc }: { url?: string | null; directSrc?: string | null }) {
   if (!url) {
     return (
       <div className="flex aspect-video flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border-strong bg-bg-soft text-text-dim">
         <PlayCircle size={28} />
         <p className="text-sm">Видео появится здесь</p>
+      </div>
+    );
+  }
+
+  if (directSrc) {
+    return (
+      <div className="aspect-video overflow-hidden rounded-xl border border-border bg-black">
+        <video controls preload="metadata" src={directSrc} className="h-full w-full" />
       </div>
     );
   }

@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { LessonContent } from "@/components/LessonContent";
 import { VideoEmbed, SlidesEmbed, DriveLink } from "@/components/MediaEmbed";
+import { isYandexDiskUrl, resolveYandexDiskDirectUrl } from "@/lib/yandex-disk";
 import { LessonCompleteButton } from "@/components/LessonCompleteButton";
 import { QuizBlock } from "@/components/QuizBlock";
 import { HomeworkForm } from "@/components/HomeworkForm";
@@ -49,6 +50,11 @@ export default async function LessonPage({
   const prevLesson = index > 0 ? mod.lessons[index - 1] : null;
   const nextLesson = index < mod.lessons.length - 1 ? mod.lessons[index + 1] : null;
 
+  const videoDirectSrc =
+    lesson.videoUrl && isYandexDiskUrl(lesson.videoUrl)
+      ? await resolveYandexDiskDirectUrl(lesson.videoUrl)
+      : null;
+
   const lastSubmission = lesson.homework?.submissions[0]
     ? {
         status: lesson.homework.submissions[0].status,
@@ -91,7 +97,7 @@ export default async function LessonPage({
         )}
       </div>
 
-      <VideoEmbed url={lesson.videoUrl} />
+      <VideoEmbed url={lesson.videoUrl} directSrc={videoDirectSrc} />
 
       <div className="card p-5 sm:p-6">
         <LessonContent content={lesson.content} />
