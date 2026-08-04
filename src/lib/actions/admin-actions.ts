@@ -45,6 +45,23 @@ export async function adminSetUserPasswordAction(
   return { success: true };
 }
 
+export async function adminVerifyUserAction(userId: string) {
+  await requireAdmin();
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      emailVerified: true,
+      verificationCodeHash: null,
+      verificationCodeExpiresAt: null,
+      verificationCodeSentAt: null,
+      verificationAttempts: 0,
+    },
+  });
+
+  revalidatePath("/admin/users");
+}
+
 export async function adminDeleteUserAction(userId: string) {
   const admin = await requireAdmin();
 

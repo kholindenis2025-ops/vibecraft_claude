@@ -7,6 +7,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) {
     redirect("/login");
   }
+  if (!user.emailVerified) {
+    redirect("/verify-email");
+  }
 
   return (
     <div className="flex min-h-screen flex-col">

@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
-import { Shield } from "lucide-react";
+import { Shield, MailWarning } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { getAllUsersWithStats } from "@/lib/admin-data";
 import { Avatar } from "@/components/Avatar";
 import { AdminPasswordForm } from "@/components/AdminPasswordForm";
 import { AdminDeleteUserButton } from "@/components/AdminDeleteUserButton";
+import { AdminVerifyUserButton } from "@/components/AdminVerifyUserButton";
 
 export default async function AdminUsersPage() {
   const currentUser = await getCurrentUser();
@@ -34,6 +35,11 @@ export default async function AdminUsersPage() {
                       <Shield size={11} /> Админ
                     </span>
                   )}
+                  {!u.emailVerified && (
+                    <span className="badge !px-2 !py-0.5 text-warning">
+                      <MailWarning size={11} /> Почта не подтверждена
+                    </span>
+                  )}
                 </p>
                 <p className="truncate text-sm text-text-dim">{u.email}</p>
               </div>
@@ -54,6 +60,7 @@ export default async function AdminUsersPage() {
 
             <div className="flex shrink-0 flex-wrap items-start gap-2 sm:w-56 sm:justify-end">
               <AdminPasswordForm userId={u.id} />
+              {!u.emailVerified && <AdminVerifyUserButton userId={u.id} />}
               {u.id !== currentUser.id && (
                 <AdminDeleteUserButton userId={u.id} userName={u.name} />
               )}

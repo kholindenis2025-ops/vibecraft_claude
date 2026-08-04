@@ -5,6 +5,8 @@ import { z } from "zod";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { createSession, destroySession } from "@/lib/session";
+import { issueVerificationCode, checkVerificationCode, canResendCode } from "@/lib/verification";
+import { requireUser } from "@/lib/auth";
 
 export type AuthFormState = {
   error?: string;
@@ -47,11 +49,17 @@ export async function registerAction(
   const passwordHash = await bcrypt.hash(password, 10);
 
   const user = await prisma.user.create({
-    data: { name, email, passwordHash },
+    data: { name, email, passwordHash, emailVerified: false },
   });
 
+  try {
+    await issueVerificationCode(user.id, user.email, user.name);
+  } catch (err) {
+    console.error("Failed to send verification email", err);
+  }
+
   await createSession({ userId: user.id, role: user.role });
-  redirect("/dashboard");
+  redirect("/verify-email");
 }
 
 const loginSchema = z.object({
@@ -91,4 +99,49 @@ export async function loginAction(
 export async function logoutAction() {
   await destroySession();
   redirect("/");
+}
+
+export async function verifyEmailCodeAction(
+  _prevState: AuthFormState,
+  formData: FormData
+): Promise<AuthFormState> {
+  const user = await requireUser();
+  if (user.emailVerified) redirect("/dashboard");
+
+  const code = String(formData.get("code") ?? "").trim();
+  if (!/^\d{6}$/.test(code)) {
+    return { error: "Код должен состоять из 6 цифр" };
+  }
+
+  const result = await checkVerificationCode(user.id, code);
+  if (!result.ok) {
+    return { error: result.error };
+  }
+
+  redirect("/dashboard");
+}
+
+export type ResendState = { error?: string; sent?: boolean; waitSeconds?: number } | null;
+
+export async function resendVerificationCodeAction(): Promise<ResendState> {
+  const user = await requireUser();
+  if (user.emailVerified) redirect("/dashboard");
+
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { verificationCodeSentAt: true },
+  });
+
+  const { ok, waitSeconds } = await canResendCode(dbUser?.verificationCodeSentAt ?? null);
+  if (!ok) {
+    return { error: `Подожди ещё ${waitSeconds} сек. перед повторной отправкой`, waitSeconds };
+  }
+
+  try {
+    await issueVerificationCode(user.id, user.email, user.name);
+  } catch {
+    return { error: "Не удалось отправить письмо. Попробуй позже." };
+  }
+
+  return { sent: true };
 }

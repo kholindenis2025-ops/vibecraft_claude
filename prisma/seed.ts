@@ -1059,6 +1059,7 @@ async function main() {
         passwordHash,
         name: "Куратор курса",
         role: "ADMIN",
+        emailVerified: true,
       },
     });
     console.log(`Админ создан: ${adminEmail} / admin12345 (смените пароль в проде)`);

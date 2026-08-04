@@ -11,6 +11,7 @@ export async function getAllUsersWithStats() {
         email: true,
         role: true,
         createdAt: true,
+        emailVerified: true,
         _count: {
           select: {
             lessonProgress: { where: { completed: true } },
@@ -28,6 +29,7 @@ export async function getAllUsersWithStats() {
     email: u.email,
     role: u.role,
     createdAt: u.createdAt,
+    emailVerified: u.emailVerified,
     completedLessons: u._count.lessonProgress,
     totalLessons,
     percent:
