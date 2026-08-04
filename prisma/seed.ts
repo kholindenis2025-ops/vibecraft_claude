@@ -33,6 +33,9 @@ type LessonDef = {
   durationMin?: number;
   format?: string;
   availableFrom?: string;
+  videoUrl?: string;
+  slidesUrl?: string;
+  driveUrl?: string;
   quiz?: QuizDef;
   homework?: HomeworkDef;
 };
@@ -70,6 +73,9 @@ function lesson(opts: {
   format?: string;
   availableFrom?: string;
   durationMin?: number;
+  videoUrl?: string;
+  slidesUrl?: string;
+  driveUrl?: string;
   quiz?: QuizDef;
   homework?: HomeworkDef;
 }): LessonDef {
@@ -81,6 +87,9 @@ function lesson(opts: {
     format: opts.format,
     availableFrom: opts.availableFrom,
     durationMin: opts.durationMin,
+    videoUrl: opts.videoUrl,
+    slidesUrl: opts.slidesUrl,
+    driveUrl: opts.driveUrl,
     quiz: opts.quiz,
     homework: opts.homework,
   };
@@ -180,6 +189,42 @@ const modules: ModuleDef[] = [
         summary: "С чего начинается путь и что тебя ждёт в этом модуле.",
         format: "Урок в записи",
         availableFrom: "2026-08-03T11:00:00",
+        videoUrl: "https://drive.google.com/file/d/1oA3Pwrp1A6ApJywzDtg8Eb3MGqItfzU4/view",
+        slidesUrl: "https://drive.google.com/file/d/1aBw7tg5xCYOvFCmwP9tSwQDiZNprNEoO/view",
+        content: `## Что такое вайбкодинг
+
+Вайбкодинг = Vibe (настроение, идея, описанная простыми словами) + Coding (код, который создаёт за тебя ИИ). Ты не пишешь код руками — ты управляешь процессом, а техническую работу делает ИИ.
+
+Это похоже на заказ в ресторане: ты не повар, но можешь точно описать, что хочешь получить — и получаешь готовое блюдо. Вайбкодер — это человек, который создаёт продукты, описывая, что он хочет получить, а не как это запрограммировать.
+
+## Почему это работает именно сейчас
+
+- Инструменты стали доступны каждому — Claude Code, Lovable, Google AI Studio, ChatGPT работают без специальной подготовки
+- Конкуренция минимальна — большинство ещё не знает, что так можно
+- Рынку нужны цифровые продукты, а программистов на всех не хватает
+
+Раньше создать продукт означало: найти программиста (недели), объяснить задачу, ждать результат месяц и заплатить от 50 000 до 300 000 ₽ — и не факт, что получишь то, что хотел. Сейчас можно открыть ИИ, описать, что нужно, и получить рабочую версию за пару часов.
+
+## Как выглядит весь процесс
+
+1. **Идея.** Достаточно понимать, что ты хочешь создать в целом — не нужно знать, как это будет устроено технически, какие кнопки и где будут, какие цвета использовать.
+2. **Описание.** Рассказываешь идею обычными словами — как объясняешь другу или коллеге. Чем конкретнее описание, тем точнее результат.
+3. **Claude Code.** ИИ-помощник читает описание и пишет код — по сути, это переводчик с человеческого языка на компьютерный.
+4. **GitHub.** Код сохраняется в «облаке» — как Google Drive, только для кода: чтобы ничего не потерялось и можно было делиться результатом.
+
+**Пример хорошего описания задачи:**
+
+> Создай приложение «финансовый трекер». Вверху экрана — общая сумма расходов за месяц. Ниже — форма добавления расхода: поле суммы, категория (Еда, Транспорт, Развлечения, Здоровье, Одежда, Другое), кнопка «Добавить». Под формой — список трат: дата, категория, сумма, кнопка удаления. Дизайн простой и светлый, один акцентный цвет для кнопок.
+
+## Что можно создавать
+
+Мобильные и веб-приложения, простые игры, дашборды и трекеры, чат-боты и ассистентов, инструменты для работы, приложения для бизнеса — всё то же самое, что раньше стоило от нескольких десятков до сотен тысяч рублей и недель работы программиста.
+
+## Главное, что меняется
+
+Дело не только в инструменте — меняется мышление. Раньше на хорошую идею реагировали «жаль, не могу это сделать». Теперь — «отличная идея, сделаю к вечеру».
+
+*В следующем уроке начнём установку всех программ: Claude Code, VS Code и GitHub.*`,
       }),
       lesson({
         slug: "urok-2-1-nastraivaem-claude-code",
@@ -893,6 +938,9 @@ async function main() {
           durationMin: l.durationMin ?? 10,
           format: l.format ?? null,
           availableFrom,
+          videoUrl: l.videoUrl ?? null,
+          slidesUrl: l.slidesUrl ?? null,
+          driveUrl: l.driveUrl ?? null,
         },
         create: {
           moduleId: moduleRow.id,
@@ -904,6 +952,9 @@ async function main() {
           durationMin: l.durationMin ?? 10,
           format: l.format ?? null,
           availableFrom,
+          videoUrl: l.videoUrl ?? null,
+          slidesUrl: l.slidesUrl ?? null,
+          driveUrl: l.driveUrl ?? null,
         },
       });
 
