@@ -197,7 +197,7 @@ const modules: ModuleDef[] = [
         summary: "С чего начинается путь и что тебя ждёт в этом модуле.",
         format: "Урок в записи",
         availableFrom: "2026-08-03T11:00:00",
-        videoUrl: "https://drive.google.com/file/d/1oA3Pwrp1A6ApJywzDtg8Eb3MGqItfzU4/view",
+        videoUrl: "https://disk.yandex.ru/i/oQ1hIWMa1loSqQ",
         slidesUrl: "https://drive.google.com/file/d/1aBw7tg5xCYOvFCmwP9tSwQDiZNprNEoO/view",
         homework: homeworkFor(
           "Задание",
