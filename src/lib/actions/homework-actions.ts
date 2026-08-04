@@ -84,4 +84,5 @@ export async function reviewHomeworkAction(
 
   revalidatePath("/admin/homework");
   revalidatePath("/achievements");
+  revalidatePath(`/admin/users/${submission.studentId}`);
 }

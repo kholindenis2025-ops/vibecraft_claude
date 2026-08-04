@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Shield, GraduationCap, MailWarning } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
@@ -34,38 +35,43 @@ export default async function AdminUsersPage() {
           const badge = ROLE_BADGE[u.role];
           return (
             <div key={u.id} className="card flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
-              <div className="flex min-w-0 flex-1 items-center gap-3">
-                <Avatar name={u.name} size={36} />
-                <div className="min-w-0">
-                  <p className="flex items-center gap-1.5 truncate font-semibold">
-                    {u.name}
-                    {badge && (
-                      <span className="badge-accent !px-2 !py-0.5">
-                        <badge.icon size={11} /> {badge.label}
-                      </span>
-                    )}
-                    {!u.emailVerified && (
-                      <span className="badge !px-2 !py-0.5 text-warning">
-                        <MailWarning size={11} /> Почта не подтверждена
-                      </span>
-                    )}
-                  </p>
-                  <p className="truncate text-sm text-text-dim">{u.email}</p>
+              <Link
+                href={`/admin/users/${u.id}`}
+                className="-m-2 flex min-w-0 flex-1 flex-col gap-4 rounded-lg p-2 transition-colors hover:bg-bg-soft sm:flex-row sm:items-center"
+              >
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <Avatar name={u.name} size={36} />
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 truncate font-semibold">
+                      {u.name}
+                      {badge && (
+                        <span className="badge-accent !px-2 !py-0.5">
+                          <badge.icon size={11} /> {badge.label}
+                        </span>
+                      )}
+                      {!u.emailVerified && (
+                        <span className="badge !px-2 !py-0.5 text-warning">
+                          <MailWarning size={11} /> Почта не подтверждена
+                        </span>
+                      )}
+                    </p>
+                    <p className="truncate text-sm text-text-dim">{u.email}</p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex shrink-0 flex-col gap-1 sm:w-48">
-                <div className="flex items-center justify-between text-xs text-text-dim">
-                  <span>Прогресс</span>
-                  <span>
-                    {u.completedLessons}/{u.totalLessons} · {u.percent}%
-                  </span>
+                <div className="flex shrink-0 flex-col gap-1 sm:w-48">
+                  <div className="flex items-center justify-between text-xs text-text-dim">
+                    <span>Прогресс</span>
+                    <span>
+                      {u.completedLessons}/{u.totalLessons} · {u.percent}%
+                    </span>
+                  </div>
+                  <div className="progress-track">
+                    <div className="progress-fill" style={{ width: `${u.percent}%` }} />
+                  </div>
+                  <p className="text-xs text-text-dim">Достижений: {u.achievementsCount}</p>
                 </div>
-                <div className="progress-track">
-                  <div className="progress-fill" style={{ width: `${u.percent}%` }} />
-                </div>
-                <p className="text-xs text-text-dim">Достижений: {u.achievementsCount}</p>
-              </div>
+              </Link>
 
               {isAdmin && (
                 <div className="flex shrink-0 flex-wrap items-start gap-2 sm:w-64 sm:justify-end">
