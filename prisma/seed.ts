@@ -191,6 +191,10 @@ const modules: ModuleDef[] = [
         availableFrom: "2026-08-03T11:00:00",
         videoUrl: "https://drive.google.com/file/d/1oA3Pwrp1A6ApJywzDtg8Eb3MGqItfzU4/view",
         slidesUrl: "https://drive.google.com/file/d/1aBw7tg5xCYOvFCmwP9tSwQDiZNprNEoO/view",
+        homework: homeworkFor(
+          "Задание",
+          "1. Установить VS Code + Claude Code (если не сделали на уроке)\n2. Создать папку проекта\n3. Создать GitHub-аккаунт, подключить проект, сделать commit и push"
+        ),
         content: `## Что такое вайбкодинг
 
 Вайбкодинг = Vibe (настроение, идея, описанная простыми словами) + Coding (код, который создаёт за тебя ИИ). Ты не пишешь код руками — ты управляешь процессом, а техническую работу делает ИИ.

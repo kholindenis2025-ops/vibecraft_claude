@@ -42,7 +42,7 @@ export function HomeworkForm({
         <ClipboardList className="text-accent" size={20} />
         <h2 className="font-bold">{title}</h2>
       </div>
-      <p className="mb-4 text-sm text-text-muted">{description}</p>
+      <p className="mb-4 whitespace-pre-line text-sm text-text-muted">{description}</p>
 
       {lastSubmission && (
         <div className="mb-4 rounded-xl border border-border-strong bg-bg-soft p-4">
