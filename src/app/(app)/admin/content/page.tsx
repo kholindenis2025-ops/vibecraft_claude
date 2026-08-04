@@ -15,7 +15,12 @@ export default async function AdminContentPage() {
     include: {
       lessons: {
         orderBy: { order: "asc" },
-        select: { id: true, title: true, videoUrl: true, homework: { select: { id: true } } },
+        select: {
+          id: true,
+          title: true,
+          homework: { select: { id: true } },
+          _count: { select: { videos: true } },
+        },
       },
     },
   });
@@ -51,7 +56,7 @@ export default async function AdminContentPage() {
                   >
                     <FileEdit size={15} className="shrink-0 text-text-dim" />
                     <span className="min-w-0 flex-1 truncate">{lesson.title}</span>
-                    {lesson.videoUrl && (
+                    {lesson._count.videos > 0 && (
                       <span title="Есть видео">
                         <PlayCircle size={14} className="shrink-0 text-accent" />
                       </span>

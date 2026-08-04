@@ -33,6 +33,8 @@ export default async function LessonPage({
       quiz: { include: { questions: { orderBy: { order: "asc" } } } },
       terms: { orderBy: { order: "asc" } },
       resources: { orderBy: { order: "asc" } },
+      videos: { orderBy: { order: "asc" } },
+      slides: { orderBy: { order: "asc" } },
       homework: {
         include: {
           submissions: {
@@ -55,13 +57,11 @@ export default async function LessonPage({
   const prevLesson = index > 0 ? mod.lessons[index - 1] : null;
   const nextLesson = index < mod.lessons.length - 1 ? mod.lessons[index + 1] : null;
 
-  const videoDirectSrc = !lesson.videoUrl
-    ? null
-    : isYandexDiskUrl(lesson.videoUrl)
-      ? `/api/video/${lesson.id}`
-      : isDirectVideoUrl(lesson.videoUrl)
-        ? lesson.videoUrl
-        : null;
+  function videoDirectSrc(video: { id: string; url: string }): string | null {
+    if (isYandexDiskUrl(video.url)) return `/api/video/${video.id}`;
+    if (isDirectVideoUrl(video.url)) return video.url;
+    return null;
+  }
 
   const lastSubmission = lesson.homework?.submissions[0]
     ? {
@@ -106,7 +106,18 @@ export default async function LessonPage({
         )}
       </div>
 
-      <VideoEmbed url={lesson.videoUrl} directSrc={videoDirectSrc} />
+      {lesson.videos.length > 0 ? (
+        lesson.videos.map((video, i) => (
+          <div key={video.id}>
+            {(video.title || lesson.videos.length > 1) && (
+              <h2 className="mb-2 font-bold">{video.title || `Видео ${i + 1}`}</h2>
+            )}
+            <VideoEmbed url={video.url} directSrc={videoDirectSrc(video)} />
+          </div>
+        ))
+      ) : (
+        <VideoEmbed url={null} />
+      )}
 
       <div className="card p-5 sm:p-6">
         <LessonContent content={lesson.content} />
@@ -114,12 +125,14 @@ export default async function LessonPage({
 
       {lesson.terms.length > 0 && <LessonGlossary terms={lesson.terms} />}
 
-      {lesson.slidesUrl && (
-        <div>
-          <h2 className="mb-3 font-bold">Презентация</h2>
-          <SlidesEmbed url={lesson.slidesUrl} />
+      {lesson.slides.map((slide, i) => (
+        <div key={slide.id}>
+          <h2 className="mb-3 font-bold">
+            {slide.title || (lesson.slides.length > 1 ? `Презентация ${i + 1}` : "Презентация")}
+          </h2>
+          <SlidesEmbed url={slide.url} />
         </div>
-      )}
+      ))}
 
       {lesson.resources.length > 0 && <ResourceLinks resources={lesson.resources} />}
 

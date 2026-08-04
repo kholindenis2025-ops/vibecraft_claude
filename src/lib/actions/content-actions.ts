@@ -26,6 +26,11 @@ function isTerm(v: unknown): v is { term: string; definition: string } {
   return typeof t?.term === "string" && t.term.trim() !== "" && typeof t?.definition === "string" && t.definition.trim() !== "";
 }
 
+function isMedia(v: unknown): v is { title?: string; url: string } {
+  const m = v as { title?: unknown; url?: unknown };
+  return typeof m?.url === "string" && m.url.trim() !== "";
+}
+
 export async function adminUpdateLessonAction(
   lessonId: string,
   lessonPath: string,
@@ -40,8 +45,6 @@ export async function adminUpdateLessonAction(
   const format = String(formData.get("format") ?? "").trim();
   const durationMinRaw = String(formData.get("durationMin") ?? "").trim();
   const availableFromRaw = String(formData.get("availableFrom") ?? "").trim();
-  const videoUrl = String(formData.get("videoUrl") ?? "").trim();
-  const slidesUrl = String(formData.get("slidesUrl") ?? "").trim();
 
   if (!title) {
     return { error: "Название урока не может быть пустым" };
@@ -59,6 +62,8 @@ export async function adminUpdateLessonAction(
 
   const resources = parseJsonArray(formData.get("resourcesJson"), isResource);
   const terms = parseJsonArray(formData.get("termsJson"), isTerm);
+  const videos = parseJsonArray(formData.get("videosJson"), isMedia);
+  const slides = parseJsonArray(formData.get("slidesJson"), isMedia);
 
   const homeworkEnabled = formData.get("homeworkEnabled") === "on";
   const homeworkTitle = String(formData.get("homeworkTitle") ?? "").trim();
@@ -78,10 +83,22 @@ export async function adminUpdateLessonAction(
         format: format || null,
         durationMin,
         availableFrom,
-        videoUrl: videoUrl || null,
-        slidesUrl: slidesUrl || null,
       },
     });
+
+    await tx.lessonVideo.deleteMany({ where: { lessonId } });
+    if (videos.length > 0) {
+      await tx.lessonVideo.createMany({
+        data: videos.map((v, i) => ({ lessonId, order: i + 1, title: v.title || null, url: v.url })),
+      });
+    }
+
+    await tx.lessonSlide.deleteMany({ where: { lessonId } });
+    if (slides.length > 0) {
+      await tx.lessonSlide.createMany({
+        data: slides.map((s, i) => ({ lessonId, order: i + 1, title: s.title || null, url: s.url })),
+      });
+    }
 
     await tx.lessonResource.deleteMany({ where: { lessonId } });
     if (resources.length > 0) {

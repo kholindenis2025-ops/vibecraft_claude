@@ -1,20 +1,12 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
-import { upload } from "@vercel/blob/client";
-import {
-  Loader2,
-  Upload,
-  Trash2,
-  Plus,
-  PlayCircle,
-  FileText,
-  CheckCircle2,
-} from "lucide-react";
+import { useActionState, useState } from "react";
+import { Trash2, Plus, PlayCircle, FileText, CheckCircle2 } from "lucide-react";
 import {
   adminUpdateLessonAction,
   type ContentFormState,
 } from "@/lib/actions/content-actions";
+import { MediaListEditor, type MediaItem } from "@/components/MediaListEditor";
 
 type Resource = { title: string; url: string };
 type Term = { term: string; definition: string };
@@ -26,8 +18,8 @@ type Initial = {
   format: string;
   durationMin: number;
   availableFrom: string;
-  videoUrl: string;
-  slidesUrl: string;
+  videos: MediaItem[];
+  slides: MediaItem[];
   resources: Resource[];
   terms: Term[];
   homeworkEnabled: boolean;
@@ -50,55 +42,18 @@ export function AdminLessonForm({
     null
   );
 
-  const [videoUrl, setVideoUrl] = useState(initial.videoUrl);
-  const [videoUploading, setVideoUploading] = useState(false);
-  const [slidesUrl, setSlidesUrl] = useState(initial.slidesUrl);
-  const [slidesUploading, setSlidesUploading] = useState(false);
+  const [videos, setVideos] = useState<MediaItem[]>(initial.videos);
+  const [slides, setSlides] = useState<MediaItem[]>(initial.slides);
   const [resources, setResources] = useState<Resource[]>(initial.resources);
   const [terms, setTerms] = useState<Term[]>(initial.terms);
   const [homeworkEnabled, setHomeworkEnabled] = useState(initial.homeworkEnabled);
-
-  const videoInputRef = useRef<HTMLInputElement>(null);
-  const slidesInputRef = useRef<HTMLInputElement>(null);
-
-  async function handleVideoUpload(file: File | undefined) {
-    if (!file) return;
-    setVideoUploading(true);
-    try {
-      const blob = await upload(file.name, file, {
-        access: "public",
-        handleUploadUrl: "/api/lesson-upload",
-      });
-      setVideoUrl(blob.url);
-    } catch {
-      alert("Не удалось загрузить видео");
-    } finally {
-      setVideoUploading(false);
-      if (videoInputRef.current) videoInputRef.current.value = "";
-    }
-  }
-
-  async function handleSlidesUpload(file: File | undefined) {
-    if (!file) return;
-    setSlidesUploading(true);
-    try {
-      const blob = await upload(file.name, file, {
-        access: "public",
-        handleUploadUrl: "/api/lesson-upload",
-      });
-      setSlidesUrl(blob.url);
-    } catch {
-      alert("Не удалось загрузить PDF");
-    } finally {
-      setSlidesUploading(false);
-      if (slidesInputRef.current) slidesInputRef.current.value = "";
-    }
-  }
+  const [videosUploading, setVideosUploading] = useState(false);
+  const [slidesUploading, setSlidesUploading] = useState(false);
 
   return (
     <form action={formAction} className="flex flex-col gap-6">
-      <input type="hidden" name="videoUrl" value={videoUrl} />
-      <input type="hidden" name="slidesUrl" value={slidesUrl} />
+      <input type="hidden" name="videosJson" value={JSON.stringify(videos)} />
+      <input type="hidden" name="slidesJson" value={JSON.stringify(slides)} />
       <input type="hidden" name="resourcesJson" value={JSON.stringify(resources)} />
       <input type="hidden" name="termsJson" value={JSON.stringify(terms)} />
 
@@ -157,86 +112,30 @@ export function AdminLessonForm({
 
       <div className="card flex flex-col gap-3 p-5 sm:p-6">
         <h2 className="font-bold">Видео</h2>
-        {videoUrl ? (
-          <div className="flex items-center gap-2 rounded-lg bg-bg-soft px-3 py-2 text-sm">
-            <PlayCircle size={16} className="shrink-0 text-accent" />
-            <span className="min-w-0 flex-1 truncate">{videoUrl}</span>
-            <button
-              type="button"
-              onClick={() => setVideoUrl("")}
-              className="shrink-0 text-text-dim hover:text-danger"
-            >
-              <Trash2 size={15} />
-            </button>
-          </div>
-        ) : (
-          <p className="text-sm text-text-dim">Видео не загружено</p>
-        )}
-        <input
-          ref={videoInputRef}
-          type="file"
+        <p className="text-sm text-text-dim">Можно загрузить несколько — например, по частям урока.</p>
+        <MediaListEditor
+          items={videos}
+          onChange={setVideos}
+          onBusyChange={setVideosUploading}
           accept="video/*"
-          className="hidden"
-          onChange={(e) => handleVideoUpload(e.target.files?.[0])}
+          icon={PlayCircle}
+          emptyLabel="Видео не загружено"
+          uploadLabel="Загрузить видео"
         />
-        <button
-          type="button"
-          onClick={() => videoInputRef.current?.click()}
-          disabled={videoUploading}
-          className="btn-secondary self-start text-sm"
-        >
-          {videoUploading ? (
-            <>
-              <Loader2 size={15} className="animate-spin" /> Загружаем…
-            </>
-          ) : (
-            <>
-              <Upload size={15} /> {videoUrl ? "Заменить видео" : "Загрузить видео"}
-            </>
-          )}
-        </button>
       </div>
 
       <div className="card flex flex-col gap-3 p-5 sm:p-6">
-        <h2 className="font-bold">Презентация (PDF)</h2>
-        {slidesUrl ? (
-          <div className="flex items-center gap-2 rounded-lg bg-bg-soft px-3 py-2 text-sm">
-            <FileText size={16} className="shrink-0 text-accent" />
-            <span className="min-w-0 flex-1 truncate">{slidesUrl}</span>
-            <button
-              type="button"
-              onClick={() => setSlidesUrl("")}
-              className="shrink-0 text-text-dim hover:text-danger"
-            >
-              <Trash2 size={15} />
-            </button>
-          </div>
-        ) : (
-          <p className="text-sm text-text-dim">Презентация не загружена</p>
-        )}
-        <input
-          ref={slidesInputRef}
-          type="file"
+        <h2 className="font-bold">Презентации (PDF)</h2>
+        <p className="text-sm text-text-dim">Можно загрузить несколько PDF-файлов.</p>
+        <MediaListEditor
+          items={slides}
+          onChange={setSlides}
+          onBusyChange={setSlidesUploading}
           accept="application/pdf"
-          className="hidden"
-          onChange={(e) => handleSlidesUpload(e.target.files?.[0])}
+          icon={FileText}
+          emptyLabel="Презентация не загружена"
+          uploadLabel="Загрузить PDF"
         />
-        <button
-          type="button"
-          onClick={() => slidesInputRef.current?.click()}
-          disabled={slidesUploading}
-          className="btn-secondary self-start text-sm"
-        >
-          {slidesUploading ? (
-            <>
-              <Loader2 size={15} className="animate-spin" /> Загружаем…
-            </>
-          ) : (
-            <>
-              <Upload size={15} /> {slidesUrl ? "Заменить PDF" : "Загрузить PDF"}
-            </>
-          )}
-        </button>
       </div>
 
       <div className="card flex flex-col gap-3 p-5 sm:p-6">
@@ -371,9 +270,15 @@ export function AdminLessonForm({
         </p>
       )}
 
+      {(videosUploading || slidesUploading) && (
+        <p className="text-sm text-text-dim">
+          Дождись, пока файлы загрузятся, прежде чем сохранять.
+        </p>
+      )}
+
       <button
         type="submit"
-        disabled={pending || videoUploading || slidesUploading}
+        disabled={pending || videosUploading || slidesUploading}
         className="btn-primary self-start"
       >
         {pending ? "Сохраняем…" : "Сохранить"}

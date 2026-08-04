@@ -35,6 +35,11 @@ type ResourceDef = {
   url: string;
 };
 
+type MediaDef = {
+  title?: string;
+  url: string;
+};
+
 type LessonDef = {
   slug: string;
   title: string;
@@ -43,8 +48,8 @@ type LessonDef = {
   durationMin?: number;
   format?: string;
   availableFrom?: string;
-  videoUrl?: string;
-  slidesUrl?: string;
+  videos?: MediaDef[];
+  slides?: MediaDef[];
   quiz?: QuizDef;
   homework?: HomeworkDef;
   terms?: TermDef[];
@@ -84,8 +89,8 @@ function lesson(opts: {
   format?: string;
   availableFrom?: string;
   durationMin?: number;
-  videoUrl?: string;
-  slidesUrl?: string;
+  videos?: MediaDef[];
+  slides?: MediaDef[];
   quiz?: QuizDef;
   homework?: HomeworkDef;
   terms?: TermDef[];
@@ -99,8 +104,8 @@ function lesson(opts: {
     format: opts.format,
     availableFrom: opts.availableFrom,
     durationMin: opts.durationMin,
-    videoUrl: opts.videoUrl,
-    slidesUrl: opts.slidesUrl,
+    videos: opts.videos,
+    slides: opts.slides,
     quiz: opts.quiz,
     homework: opts.homework,
     terms: opts.terms,
@@ -202,8 +207,8 @@ const modules: ModuleDef[] = [
         summary: "С чего начинается путь и что тебя ждёт в этом модуле.",
         format: "Урок в записи",
         availableFrom: "2026-08-03T11:00:00",
-        videoUrl: "https://disk.yandex.ru/i/oQ1hIWMa1loSqQ",
-        slidesUrl: "https://drive.google.com/file/d/1aBw7tg5xCYOvFCmwP9tSwQDiZNprNEoO/view",
+        videos: [{ url: "https://disk.yandex.ru/i/oQ1hIWMa1loSqQ" }],
+        slides: [{ url: "https://drive.google.com/file/d/1aBw7tg5xCYOvFCmwP9tSwQDiZNprNEoO/view" }],
         homework: homeworkFor(
           "Задание",
           "1. Установить VS Code + Claude Code (если не сделали на уроке)\n2. Создать папку проекта\n3. Создать GitHub-аккаунт, подключить проект, сделать commit и push"
@@ -982,8 +987,6 @@ async function main() {
           durationMin: l.durationMin ?? 10,
           format: l.format ?? null,
           availableFrom,
-          videoUrl: l.videoUrl ?? null,
-          slidesUrl: l.slidesUrl ?? null,
         },
         create: {
           moduleId: moduleRow.id,
@@ -995,10 +998,28 @@ async function main() {
           durationMin: l.durationMin ?? 10,
           format: l.format ?? null,
           availableFrom,
-          videoUrl: l.videoUrl ?? null,
-          slidesUrl: l.slidesUrl ?? null,
         },
       });
+
+      await prisma.lessonVideo.deleteMany({ where: { lessonId: lesson.id } });
+      if (l.videos) {
+        for (let v = 0; v < l.videos.length; v++) {
+          const video = l.videos[v];
+          await prisma.lessonVideo.create({
+            data: { lessonId: lesson.id, order: v + 1, title: video.title, url: video.url },
+          });
+        }
+      }
+
+      await prisma.lessonSlide.deleteMany({ where: { lessonId: lesson.id } });
+      if (l.slides) {
+        for (let s = 0; s < l.slides.length; s++) {
+          const slide = l.slides[s];
+          await prisma.lessonSlide.create({
+            data: { lessonId: lesson.id, order: s + 1, title: slide.title, url: slide.url },
+          });
+        }
+      }
 
       if (l.quiz) {
         const quiz = await prisma.quiz.upsert({

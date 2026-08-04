@@ -56,6 +56,7 @@ export function HomeworkForm({
 
   const [files, setFiles] = useState<SubmissionFile[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -71,9 +72,11 @@ export function HomeworkForm({
           setUploadError(`«${file.name}» больше 100 МБ — не загружен`);
           continue;
         }
+        setUploadProgress(0);
         const blob = await upload(file.name, file, {
           access: "public",
           handleUploadUrl: "/api/homework-upload",
+          onUploadProgress: (event) => setUploadProgress(event.percentage),
         });
         setFiles((prev) => [...prev, { name: file.name, url: blob.url, size: file.size }]);
       }
@@ -186,7 +189,7 @@ export function HomeworkForm({
             >
               {uploading ? (
                 <>
-                  <Loader2 size={15} className="animate-spin" /> Загружаем…
+                  <Loader2 size={15} className="animate-spin" /> Загружаем… {Math.round(uploadProgress)}%
                 </>
               ) : (
                 <>
@@ -194,6 +197,11 @@ export function HomeworkForm({
                 </>
               )}
             </button>
+            {uploading && (
+              <div className="progress-track">
+                <div className="progress-fill" style={{ width: `${uploadProgress}%` }} />
+              </div>
+            )}
             <p className="text-xs text-text-dim">Максимальный размер файла — 100 МБ</p>
 
             {files.length > 0 && (

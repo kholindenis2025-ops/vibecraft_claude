@@ -74,8 +74,6 @@ model Lesson {
   title       String
   summary     String  @default("")
   content     String  @default("")
-  videoUrl    String?
-  slidesUrl   String?
   durationMin Int     @default(10)
   format      String?
   availableFrom DateTime?
@@ -85,8 +83,32 @@ model Lesson {
   homework  Homework?
   terms     LessonTerm[]
   resources LessonResource[]
+  videos    LessonVideo[]
+  slides    LessonSlide[]
 
   @@unique([moduleId, slug])
+}
+
+model LessonVideo {
+  id       String @id @default(cuid())
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  order    Int
+  title    String?
+  url      String
+
+  @@unique([lessonId, order])
+}
+
+model LessonSlide {
+  id       String @id @default(cuid())
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  order    Int
+  title    String?
+  url      String
+
+  @@unique([lessonId, order])
 }
 
 model LessonResource {

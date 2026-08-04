@@ -21,6 +21,8 @@ export default async function AdminEditLessonPage({
       module: { select: { slug: true, title: true } },
       terms: { orderBy: { order: "asc" } },
       resources: { orderBy: { order: "asc" } },
+      videos: { orderBy: { order: "asc" } },
+      slides: { orderBy: { order: "asc" } },
       homework: true,
     },
   });
@@ -50,8 +52,8 @@ export default async function AdminEditLessonPage({
                 .toISOString()
                 .slice(0, 16)
             : "",
-          videoUrl: lesson.videoUrl ?? "",
-          slidesUrl: lesson.slidesUrl ?? "",
+          videos: lesson.videos.map((v) => ({ title: v.title ?? "", url: v.url })),
+          slides: lesson.slides.map((s) => ({ title: s.title ?? "", url: s.url })),
           resources: lesson.resources.map((r) => ({ title: r.title, url: r.url })),
           terms: lesson.terms.map((t) => ({ term: t.term, definition: t.definition })),
           homeworkEnabled: Boolean(lesson.homework),

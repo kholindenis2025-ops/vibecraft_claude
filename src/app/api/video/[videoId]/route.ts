@@ -3,26 +3,26 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { resolveYandexDiskDirectUrl } from "@/lib/yandex-disk";
 
-// Streams the lesson video through our own origin instead of handing the
+// Streams a lesson video through our own origin instead of handing the
 // client a Yandex-signed URL directly. Yandex's signed download links can
 // fail to play when fetched from a different network context than the one
 // that requested them (or transiently from certain hosting IP ranges), so
 // resolving AND fetching from the same place (this server) sidesteps that.
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ lessonId: string }> }
+  { params }: { params: Promise<{ videoId: string }> }
 ) {
   const user = await getCurrentUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
 
-  const { lessonId } = await params;
-  const lesson = await prisma.lesson.findUnique({
-    where: { id: lessonId },
-    select: { videoUrl: true },
+  const { videoId } = await params;
+  const video = await prisma.lessonVideo.findUnique({
+    where: { id: videoId },
+    select: { url: true },
   });
-  if (!lesson?.videoUrl) return new Response("Not found", { status: 404 });
+  if (!video) return new Response("Not found", { status: 404 });
 
-  const directUrl = await resolveYandexDiskDirectUrl(lesson.videoUrl);
+  const directUrl = await resolveYandexDiskDirectUrl(video.url);
   if (!directUrl) return new Response("Video source unavailable", { status: 502 });
 
   const range = req.headers.get("range");
