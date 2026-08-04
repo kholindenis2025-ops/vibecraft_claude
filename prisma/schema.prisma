@@ -77,8 +77,20 @@ model Lesson {
   progress LessonProgress[]
   quiz     Quiz?
   homework Homework?
+  terms    LessonTerm[]
 
   @@unique([moduleId, slug])
+}
+
+model LessonTerm {
+  id         String @id @default(cuid())
+  lessonId   String
+  lesson     Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  order      Int
+  term       String
+  definition String
+
+  @@unique([lessonId, order])
 }
 
 model LessonProgress {

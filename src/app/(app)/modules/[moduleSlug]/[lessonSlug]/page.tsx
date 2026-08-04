@@ -9,6 +9,7 @@ import { isYandexDiskUrl, resolveYandexDiskDirectUrl } from "@/lib/yandex-disk";
 import { LessonCompleteButton } from "@/components/LessonCompleteButton";
 import { QuizBlock } from "@/components/QuizBlock";
 import { HomeworkForm } from "@/components/HomeworkForm";
+import { LessonGlossary } from "@/components/LessonGlossary";
 
 export default async function LessonPage({
   params,
@@ -29,6 +30,7 @@ export default async function LessonPage({
     include: {
       progress: { where: { userId: user.id } },
       quiz: { include: { questions: { orderBy: { order: "asc" } } } },
+      terms: { orderBy: { order: "asc" } },
       homework: {
         include: {
           submissions: {
@@ -102,6 +104,8 @@ export default async function LessonPage({
       <div className="card p-5 sm:p-6">
         <LessonContent content={lesson.content} />
       </div>
+
+      {lesson.terms.length > 0 && <LessonGlossary terms={lesson.terms} />}
 
       {lesson.slidesUrl && (
         <div>

@@ -25,6 +25,11 @@ type HomeworkDef = {
   description: string;
 };
 
+type TermDef = {
+  term: string;
+  definition: string;
+};
+
 type LessonDef = {
   slug: string;
   title: string;
@@ -38,6 +43,7 @@ type LessonDef = {
   driveUrl?: string;
   quiz?: QuizDef;
   homework?: HomeworkDef;
+  terms?: TermDef[];
 };
 
 type ModuleCategory = "INTRO" | "MODULE" | "TOOL" | "BONUS" | "MATERIAL";
@@ -78,6 +84,7 @@ function lesson(opts: {
   driveUrl?: string;
   quiz?: QuizDef;
   homework?: HomeworkDef;
+  terms?: TermDef[];
 }): LessonDef {
   return {
     slug: opts.slug,
@@ -92,6 +99,7 @@ function lesson(opts: {
     driveUrl: opts.driveUrl,
     quiz: opts.quiz,
     homework: opts.homework,
+    terms: opts.terms,
   };
 }
 
@@ -195,6 +203,33 @@ const modules: ModuleDef[] = [
           "Задание",
           "1. Установить VS Code + Claude Code (если не сделали на уроке)\n2. Создать папку проекта\n3. Создать GitHub-аккаунт, подключить проект, сделать commit и push"
         ),
+        terms: [
+          {
+            term: "Вайбкодинг",
+            definition:
+              "Создание цифровых продуктов с помощью ИИ: ты описываешь словами, что хочешь получить, а код пишет нейросеть. Не требует знания языков программирования.",
+          },
+          {
+            term: "Claude Code",
+            definition:
+              "ИИ-помощник, который работает в редакторе кода: понимает описание задачи на обычном языке и сам пишет по нему код — переводчик с человеческого языка на компьютерный.",
+          },
+          {
+            term: "GitHub",
+            definition:
+              "Облачное хранилище для кода — аналог Google Диска, только для программных проектов. Здесь код сохраняется, версионируется и им можно поделиться.",
+          },
+          {
+            term: "Промпт",
+            definition:
+              "Текстовое описание задачи для ИИ: что нужно создать, для кого и с какими функциями. Чем конкретнее промпт, тем точнее результат.",
+          },
+          {
+            term: "Идея продукта",
+            definition:
+              "Краткая формулировка того, что ты хочешь создать, до начала работы с ИИ. Не требует технических деталей — только понимание задачи и аудитории.",
+          },
+        ],
         content: `## Что такое вайбкодинг
 
 Вайбкодинг = Vibe (настроение, идея, описанная простыми словами) + Coding (код, который создаёт за тебя ИИ). Ты не пишешь код руками — ты управляешь процессом, а техническую работу делает ИИ.
@@ -984,6 +1019,21 @@ async function main() {
         }
       } else {
         await prisma.quiz.deleteMany({ where: { lessonId: lesson.id } });
+      }
+
+      await prisma.lessonTerm.deleteMany({ where: { lessonId: lesson.id } });
+      if (l.terms) {
+        for (let t = 0; t < l.terms.length; t++) {
+          const term = l.terms[t];
+          await prisma.lessonTerm.create({
+            data: {
+              lessonId: lesson.id,
+              order: t + 1,
+              term: term.term,
+              definition: term.definition,
+            },
+          });
+        }
       }
 
       if (l.homework) {
