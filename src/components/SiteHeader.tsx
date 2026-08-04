@@ -8,7 +8,7 @@ type Props = {
   user: {
     name: string;
     email: string;
-    role: "STUDENT" | "ADMIN";
+    role: "STUDENT" | "CURATOR" | "ADMIN";
   };
 };
 
@@ -45,7 +45,7 @@ export function SiteHeader({ user }: Props) {
             <Trophy size={16} />
             <span className="hidden lg:inline">Достижения</span>
           </Link>
-          {user.role === "ADMIN" && (
+          {(user.role === "ADMIN" || user.role === "CURATOR") && (
             <>
               <Link
                 href="/admin/homework"

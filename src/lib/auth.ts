@@ -37,3 +37,13 @@ export async function requireAdmin() {
   }
   return user;
 }
+
+// Curators and admins can review homework and view the student roster.
+// Only admins can manage accounts (passwords, roles, deletion).
+export async function requireStaff() {
+  const user = await requireUser();
+  if (user.role !== "ADMIN" && user.role !== "CURATOR") {
+    throw new Error("FORBIDDEN");
+  }
+  return user;
+}

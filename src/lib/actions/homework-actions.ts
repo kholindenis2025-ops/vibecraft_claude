@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireUser, requireAdmin } from "@/lib/auth";
+import { requireUser, requireStaff } from "@/lib/auth";
 import { evaluateAchievements } from "@/lib/achievements";
 
 export type HomeworkFormState = { error?: string; success?: boolean } | null;
@@ -66,14 +66,14 @@ export async function reviewHomeworkAction(
   status: "APPROVED" | "REJECTED",
   feedback: string
 ) {
-  const admin = await requireAdmin();
+  const staff = await requireStaff();
 
   const submission = await prisma.homeworkSubmission.update({
     where: { id: submissionId },
     data: {
       status,
       feedback: feedback || null,
-      reviewedById: admin.id,
+      reviewedById: staff.id,
       reviewedAt: new Date(),
     },
   });

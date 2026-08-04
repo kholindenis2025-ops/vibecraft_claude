@@ -19,7 +19,7 @@ export default async function AdminHomeworkPage({
 }) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  if (user.role !== "ADMIN") redirect("/dashboard");
+  if (user.role !== "ADMIN" && user.role !== "CURATOR") redirect("/dashboard");
 
   const { status } = await searchParams;
   const activeStatus = (status ?? "PENDING") as "PENDING" | "APPROVED" | "REJECTED";

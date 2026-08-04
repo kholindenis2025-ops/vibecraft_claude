@@ -62,6 +62,26 @@ export async function adminVerifyUserAction(userId: string) {
   revalidatePath("/admin/users");
 }
 
+const ASSIGNABLE_ROLES = ["STUDENT", "CURATOR", "ADMIN"] as const;
+
+export async function adminSetUserRoleAction(userId: string, role: string) {
+  const admin = await requireAdmin();
+
+  if (admin.id === userId) {
+    throw new Error("Нельзя изменить роль своего собственного аккаунта");
+  }
+  if (!ASSIGNABLE_ROLES.includes(role as (typeof ASSIGNABLE_ROLES)[number])) {
+    throw new Error("Неизвестная роль");
+  }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { role: role as (typeof ASSIGNABLE_ROLES)[number] },
+  });
+
+  revalidatePath("/admin/users");
+}
+
 export async function adminDeleteUserAction(userId: string) {
   const admin = await requireAdmin();
 

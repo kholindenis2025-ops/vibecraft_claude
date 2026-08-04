@@ -15,7 +15,7 @@ function getSecretKey() {
 
 export type SessionPayload = {
   userId: string;
-  role: "STUDENT" | "ADMIN";
+  role: "STUDENT" | "CURATOR" | "ADMIN";
 };
 
 export async function createSession(payload: SessionPayload) {
@@ -50,7 +50,7 @@ export async function getSession(): Promise<SessionPayload | null> {
     if (typeof payload.userId !== "string" || typeof payload.role !== "string") {
       return null;
     }
-    return { userId: payload.userId, role: payload.role as "STUDENT" | "ADMIN" };
+    return { userId: payload.userId, role: payload.role as "STUDENT" | "CURATOR" | "ADMIN" };
   } catch {
     return null;
   }
