@@ -31,6 +31,7 @@ export default async function ModulePage({
                 where: { studentId: user.id },
                 orderBy: { createdAt: "desc" },
                 take: 1,
+                include: { files: true },
               },
             },
           },
@@ -51,6 +52,7 @@ export default async function ModulePage({
           answerText: lesson.homework.submissions[0].answerText,
           answerUrl: lesson.homework.submissions[0].answerUrl,
           feedback: lesson.homework.submissions[0].feedback,
+          files: lesson.homework.submissions[0].files.map((f) => ({ name: f.name, url: f.url })),
         }
       : null;
 

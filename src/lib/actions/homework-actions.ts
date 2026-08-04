@@ -18,8 +18,23 @@ export async function submitHomeworkAction(
   const answerText = String(formData.get("answerText") ?? "").trim();
   const answerUrl = String(formData.get("answerUrl") ?? "").trim();
 
-  if (!answerText && !answerUrl) {
-    return { error: "Опиши, что сделал, и/или приложи ссылку на результат" };
+  let files: { name: string; url: string; size: number }[] = [];
+  const filesJson = formData.get("filesJson");
+  if (typeof filesJson === "string" && filesJson) {
+    try {
+      const parsed = JSON.parse(filesJson);
+      if (Array.isArray(parsed)) {
+        files = parsed
+          .filter((f) => f && typeof f.name === "string" && typeof f.url === "string")
+          .map((f) => ({ name: f.name, url: f.url, size: typeof f.size === "number" ? f.size : 0 }));
+      }
+    } catch {
+      // ignore malformed input, submit without files
+    }
+  }
+
+  if (!answerText && !answerUrl && files.length === 0) {
+    return { error: "Опиши, что сделал, и/или приложи ссылку или файл" };
   }
 
   await prisma.homeworkSubmission.create({
@@ -29,6 +44,9 @@ export async function submitHomeworkAction(
       answerText,
       answerUrl: answerUrl || null,
       status: "PENDING",
+      files: {
+        create: files.map((f) => ({ name: f.name, url: f.url, size: f.size })),
+      },
     },
   });
 

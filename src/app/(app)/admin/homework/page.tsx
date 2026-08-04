@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Clock, CheckCircle2, XCircle } from "lucide-react";
+import { Clock, CheckCircle2, XCircle, FileText } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { HomeworkReviewForm } from "@/components/HomeworkReviewForm";
@@ -29,6 +29,7 @@ export default async function AdminHomeworkPage({
     orderBy: { createdAt: "asc" },
     include: {
       student: { select: { name: true, email: true } },
+      files: true,
       homework: {
         include: { lesson: { include: { module: { select: { title: true } } } } },
       },
@@ -92,6 +93,22 @@ export default async function AdminHomeworkPage({
               >
                 {s.answerUrl}
               </a>
+            )}
+
+            {s.files.length > 0 && (
+              <div className="mb-3 flex flex-col gap-1.5">
+                {s.files.map((f) => (
+                  <a
+                    key={f.id}
+                    href={f.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-sm text-accent hover:underline"
+                  >
+                    <FileText size={14} /> {f.name}
+                  </a>
+                ))}
+              </div>
             )}
 
             {activeStatus === "PENDING" ? (

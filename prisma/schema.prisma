@@ -163,6 +163,17 @@ model HomeworkSubmission {
   reviewedBy   User?            @relation("ReviewerSubmissions", fields: [reviewedById], references: [id])
   createdAt    DateTime         @default(now())
   reviewedAt   DateTime?
+  files        HomeworkSubmissionFile[]
+}
+
+model HomeworkSubmissionFile {
+  id           String             @id @default(cuid())
+  submissionId String
+  submission   HomeworkSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  name         String
+  url          String
+  size         Int
+  createdAt    DateTime           @default(now())
 }
 
 model Achievement {

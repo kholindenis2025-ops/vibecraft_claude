@@ -5,7 +5,7 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { LessonContent } from "@/components/LessonContent";
 import { VideoEmbed, SlidesEmbed, DriveLink } from "@/components/MediaEmbed";
-import { isYandexDiskUrl, resolveYandexDiskDirectUrl } from "@/lib/yandex-disk";
+import { isYandexDiskUrl } from "@/lib/yandex-disk";
 import { LessonCompleteButton } from "@/components/LessonCompleteButton";
 import { QuizBlock } from "@/components/QuizBlock";
 import { HomeworkForm } from "@/components/HomeworkForm";
@@ -37,6 +37,7 @@ export default async function LessonPage({
             where: { studentId: user.id },
             orderBy: { createdAt: "desc" },
             take: 1,
+            include: { files: true },
           },
         },
       },
@@ -53,9 +54,7 @@ export default async function LessonPage({
   const nextLesson = index < mod.lessons.length - 1 ? mod.lessons[index + 1] : null;
 
   const videoDirectSrc =
-    lesson.videoUrl && isYandexDiskUrl(lesson.videoUrl)
-      ? await resolveYandexDiskDirectUrl(lesson.videoUrl)
-      : null;
+    lesson.videoUrl && isYandexDiskUrl(lesson.videoUrl) ? `/api/video/${lesson.id}` : null;
 
   const lastSubmission = lesson.homework?.submissions[0]
     ? {
@@ -63,6 +62,7 @@ export default async function LessonPage({
         answerText: lesson.homework.submissions[0].answerText,
         answerUrl: lesson.homework.submissions[0].answerUrl,
         feedback: lesson.homework.submissions[0].feedback,
+        files: lesson.homework.submissions[0].files.map((f) => ({ name: f.name, url: f.url })),
       }
     : null;
 
