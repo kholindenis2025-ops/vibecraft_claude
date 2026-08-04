@@ -17,7 +17,7 @@ export function LessonGlossary({ terms }: { terms: Term[] }) {
           <BookOpen size={20} />
         </span>
         <div>
-          <h2 className="font-bold">Словарик урока</h2>
+          <h2 className="font-bold">Словарь урока</h2>
           <p className="text-sm text-text-muted">Нажми на термин, чтобы раскрыть определение</p>
         </div>
       </div>
