@@ -3,6 +3,7 @@ import { LayoutDashboard, BookOpen, Trophy, ClipboardCheck, Users, FileEdit, Log
 import { logoutAction } from "@/lib/actions/auth-actions";
 import { Logo } from "@/components/Logo";
 import { Avatar } from "@/components/Avatar";
+import { InstallAppButton } from "@/components/InstallAppButton";
 
 type Props = {
   user: {
@@ -75,6 +76,10 @@ export function SiteHeader({ user }: Props) {
         </nav>
 
         <div className="flex items-center gap-3">
+          <InstallAppButton
+            iconOnly
+            className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-text-muted transition-colors hover:bg-card hover:text-accent"
+          />
           <div className="hidden items-center gap-2 lg:flex">
             <Avatar name={user.name} size={32} />
             <span className="text-sm font-medium">{user.name}</span>

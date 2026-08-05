@@ -14,6 +14,7 @@ import { prisma } from "@/lib/prisma";
 import { CATEGORY_SECTION_LABELS, categoryBadge, groupByCategory } from "@/lib/categories";
 import { ModuleIcon } from "@/lib/module-icons";
 import { Logo } from "@/components/Logo";
+import { InstallAppButton } from "@/components/InstallAppButton";
 import { lessonsWord } from "@/lib/plural";
 
 export default async function HomePage() {
@@ -44,6 +45,7 @@ export default async function HomePage() {
           VIBE<span className="text-accent">CRAFT</span>
         </div>
         <div className="flex items-center gap-2">
+          <InstallAppButton className="btn-ghost" />
           {user ? (
             <Link href="/dashboard" className="btn-primary">
               В дашборд
