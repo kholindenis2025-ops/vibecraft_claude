@@ -13,6 +13,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { submitHomeworkAction, type HomeworkFormState } from "@/lib/actions/homework-actions";
+import { LessonContent } from "@/components/LessonContent";
 
 type SubmissionFile = { name: string; url: string; size: number };
 
@@ -98,7 +99,9 @@ export function HomeworkForm({
         <ClipboardList className="text-accent" size={20} />
         <h2 className="font-bold">{title}</h2>
       </div>
-      <p className="mb-4 whitespace-pre-line text-sm text-text-muted">{description}</p>
+      <div className="mb-4 text-sm">
+        <LessonContent content={description} />
+      </div>
 
       {lastSubmission && (
         <div className="mb-4 rounded-xl border border-border-strong bg-bg-soft p-4">

@@ -251,7 +251,7 @@ export function AdminLessonForm({
             <textarea
               name="homeworkDescription"
               defaultValue={initial.homeworkDescription}
-              placeholder="Что нужно сделать"
+              placeholder="Что нужно сделать. Поддерживается разметка: **жирный**, *курсив*, ## заголовок"
               rows={5}
               className="input resize-y"
             />
