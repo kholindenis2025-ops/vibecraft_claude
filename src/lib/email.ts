@@ -27,10 +27,19 @@ export async function sendVerificationEmail(to: string, name: string, code: stri
     </div>
   </div>`;
 
-  await resend.emails.send({
+  const result = await resend.emails.send({
     from: FROM,
     to,
     subject: `Код подтверждения: ${code}`,
     html,
   });
+
+  // The Resend SDK does NOT throw on API-level failures — it resolves with
+  // { data: null, error: {...} }. Without this check, a rejected send
+  // (e.g. the sandbox onboarding@resend.dev domain refusing to deliver to
+  // anyone but the account owner) looks identical to a successful one.
+  if (result.error) {
+    console.error("Resend rejected the email", result.error);
+    throw new Error(result.error.message);
+  }
 }
