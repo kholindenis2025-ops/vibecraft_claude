@@ -82,7 +82,8 @@ export function AdminLessonForm({
             <input
               name="durationMin"
               type="number"
-              min={1}
+              min={0}
+              placeholder="0 — если видео нет"
               defaultValue={initial.durationMin}
               className="input"
             />

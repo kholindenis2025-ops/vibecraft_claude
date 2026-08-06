@@ -166,9 +166,11 @@ export default async function ModulePage({
                 )}
               </div>
               <div className="flex shrink-0 items-center gap-2 text-text-dim">
-                <span className="hidden items-center gap-1 text-xs sm:flex">
-                  <Clock size={13} /> {lesson.durationMin} мин
-                </span>
+                {lesson.durationMin > 0 && (
+                  <span className="hidden items-center gap-1 text-xs sm:flex">
+                    <Clock size={13} /> {lesson.durationMin} мин
+                  </span>
+                )}
                 {lesson.quiz && (
                   <span title="Есть тест">
                     <HelpCircle size={16} />

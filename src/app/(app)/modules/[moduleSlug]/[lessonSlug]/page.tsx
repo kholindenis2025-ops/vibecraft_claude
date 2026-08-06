@@ -83,9 +83,11 @@ export default async function LessonPage({
         <Link href={modulePath} className="text-sm text-text-muted hover:text-accent">
           ← {mod.title}
         </Link>
-        <span className="flex items-center gap-1.5 text-xs text-text-dim">
-          <Clock size={13} /> {lesson.durationMin} мин
-        </span>
+        {lesson.durationMin > 0 && (
+          <span className="flex items-center gap-1.5 text-xs text-text-dim">
+            <Clock size={13} /> {lesson.durationMin} мин
+          </span>
+        )}
       </div>
 
       <div>

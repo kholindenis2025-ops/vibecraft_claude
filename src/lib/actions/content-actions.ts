@@ -159,9 +159,9 @@ export async function adminUpdateLessonAction(
     return { error: "Название урока не может быть пустым" };
   }
 
-  const durationMin = durationMinRaw ? Number(durationMinRaw) : 10;
-  if (!Number.isFinite(durationMin) || durationMin <= 0) {
-    return { error: "Длительность должна быть положительным числом" };
+  const durationMin = durationMinRaw ? Number(durationMinRaw) : 0;
+  if (!Number.isFinite(durationMin) || durationMin < 0) {
+    return { error: "Длительность не может быть отрицательной" };
   }
 
   const availableFrom = availableFromRaw ? new Date(availableFromRaw) : null;
