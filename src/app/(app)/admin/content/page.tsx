@@ -3,10 +3,10 @@ import { Plus } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { groupByCategory, CATEGORY_SECTION_LABELS, CATEGORY_CARD_LABELS, CATEGORY_ORDER, type ModuleCategory } from "@/lib/categories";
-import { MODULE_ICONS } from "@/lib/module-icons";
 import { adminCreateModuleAction, adminCreateLessonAction } from "@/lib/actions/content-actions";
 import { AdminDeleteModuleButton } from "@/components/AdminDeleteModuleButton";
 import { AdminLessonList } from "@/components/AdminLessonList";
+import { IconPicker } from "@/components/IconPicker";
 
 export default async function AdminContentPage() {
   const user = await getCurrentUser();
@@ -55,21 +55,16 @@ export default async function AdminContentPage() {
             rows={2}
             className="input resize-y"
           />
-          <div className="flex flex-wrap gap-3">
-            <select name="category" defaultValue="MODULE" className="input !w-auto">
-              {CATEGORY_ORDER.map((c) => (
-                <option key={c} value={c}>
-                  {CATEGORY_CARD_LABELS[c]}
-                </option>
-              ))}
-            </select>
-            <select name="icon" defaultValue="compass" className="input !w-auto">
-              {Object.keys(MODULE_ICONS).map((key) => (
-                <option key={key} value={key}>
-                  {key}
-                </option>
-              ))}
-            </select>
+          <select name="category" defaultValue="MODULE" className="input !w-auto">
+            {CATEGORY_ORDER.map((c) => (
+              <option key={c} value={c}>
+                {CATEGORY_CARD_LABELS[c]}
+              </option>
+            ))}
+          </select>
+          <div>
+            <p className="mb-2 text-xs font-medium text-text-dim">Иконка модуля</p>
+            <IconPicker name="icon" defaultValue="compass" />
           </div>
           <button type="submit" className="btn-primary self-start">
             Создать модуль

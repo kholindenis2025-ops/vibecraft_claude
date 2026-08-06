@@ -35,6 +35,24 @@ export const MODULE_ICONS: Record<string, LucideIcon> = {
   "notebook-pen": NotebookPen,
 };
 
+export const MODULE_ICON_LABELS: Record<string, string> = {
+  "shield-alert": "Предупреждение",
+  compass: "Компас",
+  lightbulb: "Идея",
+  radar: "Радар",
+  "layout-grid": "Сетка",
+  globe: "Глобус",
+  handshake: "Рукопожатие",
+  flag: "Флажок",
+  map: "Карта",
+  wrench: "Инструмент",
+  "piggy-bank": "Копилка",
+  bot: "Робот",
+  smartphone: "Смартфон",
+  library: "Библиотека",
+  "notebook-pen": "Блокнот",
+};
+
 export function ModuleIcon({
   iconKey,
   size = 20,
