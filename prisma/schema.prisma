@@ -48,7 +48,7 @@ model User {
   submissions       HomeworkSubmission[] @relation("StudentSubmissions")
   reviewedByAdmin   HomeworkSubmission[] @relation("ReviewerSubmissions")
   achievements      UserAchievement[]
-  notificationState NotificationState?
+  notificationReads NotificationRead[]
 }
 
 model Notification {
@@ -57,12 +57,19 @@ model Notification {
   message   String
   href      String
   createdAt DateTime @default(now())
+
+  reads NotificationRead[]
 }
 
-model NotificationState {
-  userId     String   @id
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lastSeenAt DateTime
+model NotificationRead {
+  id             String       @id @default(cuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notificationId String
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  readAt         DateTime     @default(now())
+
+  @@unique([userId, notificationId])
 }
 
 model Module {

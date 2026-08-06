@@ -1,24 +1,17 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Bell, ArrowRight } from "lucide-react";
+import { Bell } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { NotificationLink } from "@/components/NotificationLink";
 
 export default async function UpdatesPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const [notifications, state] = await Promise.all([
-    prisma.notification.findMany({ orderBy: { createdAt: "desc" }, take: 100 }),
-    prisma.notificationState.findUnique({ where: { userId: user.id } }),
-  ]);
-
-  const previousSeenAt = state?.lastSeenAt ?? new Date(0);
-
-  await prisma.notificationState.upsert({
-    where: { userId: user.id },
-    update: { lastSeenAt: new Date() },
-    create: { userId: user.id, lastSeenAt: new Date() },
+  const notifications = await prisma.notification.findMany({
+    where: { reads: { none: { userId: user.id } } },
+    orderBy: { createdAt: "desc" },
+    take: 100,
   });
 
   return (
@@ -27,47 +20,44 @@ export default async function UpdatesPage() {
         <span className="kicker">Обновления</span>
         <h1 className="mt-1 text-2xl font-bold sm:text-3xl">Что нового на курсе</h1>
         <p className="mt-1 text-text-muted">
-          Здесь появляются новые видео, презентации и материалы по мере добавления.
+          Новые видео, презентации и материалы. Открытая запись пропадает из этого списка.
         </p>
       </div>
 
       {notifications.length === 0 ? (
         <div className="card flex flex-col items-center gap-2 p-10 text-center text-text-muted">
           <Bell size={28} className="text-text-dim" />
-          Пока новых материалов нет — загляни позже.
+          Новых материалов нет — ты всё посмотрел(а).
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {notifications.map((n) => {
-            const isNew = n.createdAt > previousSeenAt;
-            return (
-              <Link
-                key={n.id}
-                href={n.href}
-                className="card card-hover flex items-start gap-3 p-4 sm:p-5"
-              >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent">
-                  <Bell size={18} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-bold">{n.title}</p>
-                    {isNew && <span className="badge-accent">Новое</span>}
-                  </div>
-                  <p className="mt-1 text-sm text-text-muted">{n.message}</p>
-                  <p className="mt-1.5 text-xs text-text-dim">
-                    {n.createdAt.toLocaleDateString("ru-RU", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                      timeZone: "Europe/Moscow",
-                    })}
-                  </p>
+          {notifications.map((n) => (
+            <NotificationLink
+              key={n.id}
+              notificationId={n.id}
+              href={n.href}
+              className="card card-hover flex items-start gap-3 p-4 sm:p-5"
+            >
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent">
+                <Bell size={18} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-bold">{n.title}</p>
+                  <span className="badge-accent">Новое</span>
                 </div>
-                <ArrowRight size={16} className="mt-2 shrink-0 text-text-dim" />
-              </Link>
-            );
-          })}
+                <p className="mt-1 text-sm text-text-muted">{n.message}</p>
+                <p className="mt-1.5 text-xs text-text-dim">
+                  {n.createdAt.toLocaleDateString("ru-RU", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                    timeZone: "Europe/Moscow",
+                  })}
+                </p>
+              </div>
+            </NotificationLink>
+          ))}
         </div>
       )}
     </div>
