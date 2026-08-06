@@ -119,7 +119,9 @@ export default async function AdminUserDetailPage({
           </p>
           <p className="text-sm text-text-dim">{student.email}</p>
           <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-text-dim">
-            <span>Регистрация {student.createdAt.toLocaleDateString("ru-RU")}</span>
+            <span>
+              Регистрация {student.createdAt.toLocaleDateString("ru-RU", { timeZone: "Europe/Moscow" })}
+            </span>
             {student.emailVerified ? (
               <span className="flex items-center gap-1 text-accent">
                 <MailCheck size={13} /> Почта подтверждена

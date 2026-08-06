@@ -51,7 +51,8 @@ export default async function AchievementsPage() {
                 <p className="text-sm text-text-muted">{a.description}</p>
                 {isUnlocked && unlockedAt && (
                   <p className="mt-1 text-xs text-accent">
-                    Получено {new Date(unlockedAt).toLocaleDateString("ru-RU")}
+                    Получено{" "}
+                    {new Date(unlockedAt).toLocaleDateString("ru-RU", { timeZone: "Europe/Moscow" })}
                   </p>
                 )}
               </div>

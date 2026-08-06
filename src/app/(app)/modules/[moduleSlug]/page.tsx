@@ -161,6 +161,7 @@ export default async function ModulePage({
                     {lesson.availableFrom.toLocaleDateString("ru-RU", {
                       day: "numeric",
                       month: "long",
+                      timeZone: "Europe/Moscow",
                     })}
                   </p>
                 )}

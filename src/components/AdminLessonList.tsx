@@ -93,6 +93,7 @@ export function AdminLessonList({ moduleId, lessons }: { moduleId: string; lesso
                 {new Date(lesson.contentUpdatedAt).toLocaleDateString("ru-RU", {
                   day: "numeric",
                   month: "short",
+                  timeZone: "Europe/Moscow",
                 })}
               </span>
             )}

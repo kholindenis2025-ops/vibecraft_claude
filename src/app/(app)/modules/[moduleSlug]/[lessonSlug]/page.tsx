@@ -107,6 +107,7 @@ export default async function LessonPage({
               day: "numeric",
               month: "long",
               year: "numeric",
+              timeZone: "Europe/Moscow",
             })}
           </p>
         )}

@@ -60,6 +60,7 @@ export default async function UpdatesPage() {
                       day: "numeric",
                       month: "long",
                       year: "numeric",
+                      timeZone: "Europe/Moscow",
                     })}
                   </p>
                 </div>
