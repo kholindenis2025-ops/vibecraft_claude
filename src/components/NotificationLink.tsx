@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { markNotificationReadAction } from "@/lib/actions/notification-actions";
 
@@ -15,15 +15,20 @@ export function NotificationLink({
   className?: string;
   children: React.ReactNode;
 }) {
-  const [, startTransition] = useTransition();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  function handleClick(e: React.MouseEvent) {
+    e.preventDefault();
+    startTransition(async () => {
+      await markNotificationReadAction(notificationId);
+      router.push(href);
+    });
+  }
 
   return (
-    <Link
-      href={href}
-      className={className}
-      onClick={() => startTransition(() => markNotificationReadAction(notificationId))}
-    >
+    <a href={href} className={className} aria-disabled={isPending} onClick={handleClick}>
       {children}
-    </Link>
+    </a>
   );
 }
