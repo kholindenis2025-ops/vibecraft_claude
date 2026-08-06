@@ -1,12 +1,13 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { Trash2, Plus, PlayCircle, FileText, CheckCircle2 } from "lucide-react";
 import {
   adminUpdateLessonAction,
   type ContentFormState,
 } from "@/lib/actions/content-actions";
 import { MediaListEditor, type MediaItem } from "@/components/MediaListEditor";
+import { ContentImageUpload } from "@/components/ContentImageUpload";
 
 type Resource = { title: string; url: string };
 type Term = { term: string; definition: string };
@@ -49,6 +50,8 @@ export function AdminLessonForm({
   const [homeworkEnabled, setHomeworkEnabled] = useState(initial.homeworkEnabled);
   const [videosUploading, setVideosUploading] = useState(false);
   const [slidesUploading, setSlidesUploading] = useState(false);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const homeworkRef = useRef<HTMLTextAreaElement>(null);
 
   return (
     <form action={formAction} className="flex flex-col gap-6">
@@ -100,14 +103,16 @@ export function AdminLessonForm({
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-text-muted">
-            Текст урока (поддерживает markdown: ## заголовки, **жирный**, списки)
+            Текст урока (поддерживает markdown: ## заголовки, **жирный**, списки, изображения)
           </label>
           <textarea
+            ref={contentRef}
             name="content"
             defaultValue={initial.content}
             rows={14}
             className="input resize-y font-mono text-sm"
           />
+          <ContentImageUpload textareaRef={contentRef} />
         </div>
       </div>
 
@@ -250,12 +255,14 @@ export function AdminLessonForm({
               className="input"
             />
             <textarea
+              ref={homeworkRef}
               name="homeworkDescription"
               defaultValue={initial.homeworkDescription}
               placeholder="Что нужно сделать. Поддерживается разметка: **жирный**, *курсив*, ## заголовок"
               rows={5}
               className="input resize-y"
             />
+            <ContentImageUpload textareaRef={homeworkRef} />
           </>
         )}
       </div>

@@ -21,6 +21,15 @@ export function LessonContent({ content }: { content: string }) {
         code: (props) => (
           <code className="rounded bg-bg-soft px-1.5 py-0.5 font-mono text-sm" {...props} />
         ),
+        img: ({ alt, ...props }) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            alt={alt ?? ""}
+            loading="lazy"
+            className="mb-3 w-full rounded-xl border border-border"
+            {...props}
+          />
+        ),
       }}
     >
       {content}

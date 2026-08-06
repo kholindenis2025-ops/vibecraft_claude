@@ -12,7 +12,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       onBeforeGenerateToken: async () => {
         await requireAdmin();
         return {
-          allowedContentTypes: ["video/*", "application/pdf"],
+          allowedContentTypes: ["video/*", "application/pdf", "image/*"],
           addRandomSuffix: true,
           // Lesson videos can be very large (1GB+ recordings).
           maximumSizeInBytes: 5 * 1024 * 1024 * 1024,
