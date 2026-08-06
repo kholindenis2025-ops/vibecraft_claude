@@ -1,10 +1,95 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import { slugify } from "@/lib/slugify";
 
 export type ContentFormState = { error?: string; success?: boolean } | null;
+
+const MODULE_CATEGORIES = ["INTRO", "MODULE", "TOOL", "BONUS", "MATERIAL"] as const;
+
+async function uniqueModuleSlug(base: string): Promise<string> {
+  let slug = base;
+  let n = 2;
+  while (await prisma.module.findUnique({ where: { slug }, select: { id: true } })) {
+    slug = `${base}-${n++}`;
+  }
+  return slug;
+}
+
+async function uniqueLessonSlug(moduleId: string, base: string): Promise<string> {
+  let slug = base;
+  let n = 2;
+  while (
+    await prisma.lesson.findUnique({
+      where: { moduleId_slug: { moduleId, slug } },
+      select: { id: true },
+    })
+  ) {
+    slug = `${base}-${n++}`;
+  }
+  return slug;
+}
+
+export async function adminCreateModuleAction(formData: FormData): Promise<void> {
+  await requireAdmin();
+
+  const title = String(formData.get("title") ?? "").trim();
+  if (!title) return;
+
+  const description = String(formData.get("description") ?? "").trim();
+  const categoryRaw = String(formData.get("category") ?? "MODULE");
+  const category = MODULE_CATEGORIES.includes(categoryRaw as (typeof MODULE_CATEGORIES)[number])
+    ? (categoryRaw as (typeof MODULE_CATEGORIES)[number])
+    : "MODULE";
+  const icon = String(formData.get("icon") ?? "compass").trim() || "compass";
+
+  const slug = await uniqueModuleSlug(slugify(title));
+  const maxOrder = await prisma.module.aggregate({ _max: { order: true } });
+  const order = (maxOrder._max.order ?? 0) + 1;
+
+  await prisma.module.create({
+    data: { slug, order, category, title, description, icon },
+  });
+
+  revalidatePath("/admin/content");
+  redirect("/admin/content");
+}
+
+export async function adminDeleteModuleAction(moduleId: string): Promise<void> {
+  await requireAdmin();
+  await prisma.module.delete({ where: { id: moduleId } });
+  revalidatePath("/admin/content");
+}
+
+export async function adminCreateLessonAction(moduleId: string, formData: FormData): Promise<void> {
+  await requireAdmin();
+
+  const title = String(formData.get("title") ?? "").trim();
+  if (!title) return;
+
+  const slug = await uniqueLessonSlug(moduleId, slugify(title));
+  const maxOrder = await prisma.lesson.aggregate({
+    where: { moduleId },
+    _max: { order: true },
+  });
+  const order = (maxOrder._max.order ?? 0) + 1;
+
+  const lesson = await prisma.lesson.create({
+    data: { moduleId, slug, order, title },
+  });
+
+  revalidatePath("/admin/content");
+  redirect(`/admin/content/${lesson.id}`);
+}
+
+export async function adminDeleteLessonAction(lessonId: string): Promise<void> {
+  await requireAdmin();
+  await prisma.lesson.delete({ where: { id: lessonId } });
+  revalidatePath("/admin/content");
+}
 
 function parseJsonArray<T>(raw: FormDataEntryValue | null, guard: (v: unknown) => v is T): T[] {
   if (typeof raw !== "string" || !raw) return [];
