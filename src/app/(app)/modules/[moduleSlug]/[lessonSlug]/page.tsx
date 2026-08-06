@@ -52,6 +52,19 @@ export default async function LessonPage({
   const lessonPath = `/modules/${mod.slug}/${lesson.slug}`;
   const isCompleted = Boolean(lesson.progress[0]?.completed);
 
+  // Simply visiting the lesson also counts as "seen" for the updates feed,
+  // not just clicking through from a notification link.
+  const lessonNotifications = await prisma.notification.findMany({
+    where: { href: lessonPath },
+    select: { id: true },
+  });
+  if (lessonNotifications.length > 0) {
+    await prisma.notificationRead.createMany({
+      data: lessonNotifications.map((n) => ({ userId: user.id, notificationId: n.id })),
+      skipDuplicates: true,
+    });
+  }
+
   const index = mod.lessons.findIndex((l) => l.id === lesson.id);
   const prevLesson = index > 0 ? mod.lessons[index - 1] : null;
   const nextLesson = index < mod.lessons.length - 1 ? mod.lessons[index + 1] : null;
