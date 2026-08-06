@@ -92,6 +92,7 @@ model Lesson {
   durationMin Int     @default(10)
   format      String?
   availableFrom DateTime?
+  contentUpdatedAt DateTime?
 
   progress  LessonProgress[]
   quiz      Quiz?

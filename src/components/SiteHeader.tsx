@@ -28,21 +28,21 @@ export function SiteHeader({ user, unreadCount = 0 }: Props) {
         <nav className="flex items-center gap-1 text-sm font-medium">
           <Link
             href="/dashboard"
-            className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
+            className="flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
           >
             <LayoutDashboard size={16} />
             <span className="hidden lg:inline">Дашборд</span>
           </Link>
           <Link
             href="/learn"
-            className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
+            className="flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
           >
             <BookOpen size={16} />
             <span className="hidden lg:inline">Программа</span>
           </Link>
           <Link
             href="/achievements"
-            className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
+            className="flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
           >
             <Trophy size={16} />
             <span className="hidden lg:inline">Достижения</span>
@@ -51,14 +51,14 @@ export function SiteHeader({ user, unreadCount = 0 }: Props) {
             <>
               <Link
                 href="/admin/homework"
-                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
+                className="flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
               >
                 <ClipboardCheck size={16} />
                 <span className="hidden lg:inline">Проверка ДЗ</span>
               </Link>
               <Link
                 href="/admin/users"
-                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
+                className="flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
               >
                 <Users size={16} />
                 <span className="hidden lg:inline">Пользователи</span>
@@ -68,7 +68,7 @@ export function SiteHeader({ user, unreadCount = 0 }: Props) {
           {user.role === "ADMIN" && (
             <Link
               href="/admin/content"
-              className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
+              className="flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
             >
               <FileEdit size={16} />
               <span className="hidden lg:inline">Материалы</span>

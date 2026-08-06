@@ -21,8 +21,10 @@ export default async function AdminContentPage() {
         select: {
           id: true,
           title: true,
+          content: true,
+          contentUpdatedAt: true,
           homework: { select: { id: true } },
-          _count: { select: { videos: true } },
+          _count: { select: { videos: true, slides: true } },
         },
       },
     },
@@ -89,7 +91,10 @@ export default async function AdminContentPage() {
                   id: lesson.id,
                   title: lesson.title,
                   hasHomework: Boolean(lesson.homework),
+                  hasContent: lesson.content.trim().length > 0,
                   videoCount: lesson._count.videos,
+                  slideCount: lesson._count.slides,
+                  contentUpdatedAt: lesson.contentUpdatedAt,
                 }))}
               />
               <form

@@ -208,6 +208,7 @@ export async function adminUpdateLessonAction(
         format: format || null,
         durationMin,
         availableFrom,
+        contentUpdatedAt: new Date(),
       },
     });
 

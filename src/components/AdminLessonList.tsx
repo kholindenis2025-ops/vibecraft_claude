@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
-import { FileEdit, ClipboardList, PlayCircle, GripVertical } from "lucide-react";
+import { FileEdit, ClipboardList, PlayCircle, FileText, AlignLeft, GripVertical } from "lucide-react";
 import { adminReorderLessonsAction } from "@/lib/actions/content-actions";
 import { AdminDeleteLessonButton } from "@/components/AdminDeleteLessonButton";
 
@@ -10,7 +10,10 @@ export type LessonRow = {
   id: string;
   title: string;
   hasHomework: boolean;
+  hasContent: boolean;
   videoCount: number;
+  slideCount: number;
+  contentUpdatedAt: Date | null;
 };
 
 export function AdminLessonList({ moduleId, lessons }: { moduleId: string; lessons: LessonRow[] }) {
@@ -62,14 +65,35 @@ export function AdminLessonList({ moduleId, lessons }: { moduleId: string; lesso
           >
             <FileEdit size={15} className="shrink-0 text-text-dim" />
             <span className="min-w-0 flex-1 truncate">{lesson.title}</span>
+            {lesson.hasContent && (
+              <span title="Есть текст урока">
+                <AlignLeft size={14} className="shrink-0 text-accent" />
+              </span>
+            )}
             {lesson.videoCount > 0 && (
               <span title="Есть видео">
                 <PlayCircle size={14} className="shrink-0 text-accent" />
               </span>
             )}
+            {lesson.slideCount > 0 && (
+              <span title="Есть презентация (PDF)">
+                <FileText size={14} className="shrink-0 text-accent" />
+              </span>
+            )}
             {lesson.hasHomework && (
               <span title="Есть домашнее задание">
                 <ClipboardList size={14} className="shrink-0 text-accent" />
+              </span>
+            )}
+            {lesson.contentUpdatedAt && (
+              <span
+                title="Материал обновлён"
+                className="shrink-0 whitespace-nowrap text-xs text-text-dim"
+              >
+                {new Date(lesson.contentUpdatedAt).toLocaleDateString("ru-RU", {
+                  day: "numeric",
+                  month: "short",
+                })}
               </span>
             )}
           </Link>
