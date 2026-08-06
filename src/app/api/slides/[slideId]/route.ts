@@ -14,6 +14,7 @@ export async function GET(
   if (!user) return new Response("Unauthorized", { status: 401 });
 
   const { slideId } = await params;
+  const download = req.nextUrl.searchParams.get("download");
   const slide = await prisma.lessonSlide.findUnique({
     where: { id: slideId },
     select: { url: true },
@@ -42,7 +43,10 @@ export async function GET(
     if (v) headers.set(h, v);
   }
   headers.set("accept-ranges", "bytes");
-  headers.set("content-disposition", "inline");
+  headers.set(
+    "content-disposition",
+    download ? 'attachment; filename="presentation.pdf"' : "inline"
+  );
 
   return new Response(upstream.body, { status: upstream.status, headers });
 }

@@ -18,6 +18,7 @@ export async function GET(
   if (!user) return new Response("Unauthorized", { status: 401 });
 
   const { videoId } = await params;
+  const download = req.nextUrl.searchParams.get("download");
   const video = await prisma.lessonVideo.findUnique({
     where: { id: videoId },
     select: { url: true },
@@ -51,6 +52,10 @@ export async function GET(
     if (v) headers.set(h, v);
   }
   headers.set("accept-ranges", "bytes");
+  if (download) {
+    const ext = (headers.get("content-type")?.split("/")[1] ?? "mp4").split(";")[0];
+    headers.set("content-disposition", `attachment; filename="video.${ext}"`);
+  }
 
   return new Response(upstream.body, { status: upstream.status, headers });
 }

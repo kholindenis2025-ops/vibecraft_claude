@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, BookOpen, Trophy, ClipboardCheck, Users, FileEdit, LogOut } from "lucide-react";
+import { LayoutDashboard, BookOpen, Trophy, ClipboardCheck, Users, FileEdit, LogOut, Bell } from "lucide-react";
 import { logoutAction } from "@/lib/actions/auth-actions";
 import { Logo } from "@/components/Logo";
 import { Avatar } from "@/components/Avatar";
@@ -11,9 +11,10 @@ type Props = {
     email: string;
     role: "STUDENT" | "CURATOR" | "ADMIN";
   };
+  unreadCount?: number;
 };
 
-export function SiteHeader({ user }: Props) {
+export function SiteHeader({ user, unreadCount = 0 }: Props) {
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-bg/85 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
@@ -76,6 +77,18 @@ export function SiteHeader({ user }: Props) {
         </nav>
 
         <div className="flex items-center gap-3">
+          <Link
+            href="/updates"
+            className="relative flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-text-muted transition-colors hover:bg-card hover:text-accent"
+            title="Что нового"
+          >
+            <Bell size={16} />
+            {unreadCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-bold text-white">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+          </Link>
           <InstallAppButton
             iconOnly
             className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-text-muted transition-colors hover:bg-card hover:text-accent"

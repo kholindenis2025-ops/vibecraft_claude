@@ -43,11 +43,26 @@ model User {
   verificationCodeSentAt     DateTime?
   verificationAttempts       Int       @default(0)
 
-  lessonProgress   LessonProgress[]
-  quizAttempts     QuizAttempt[]
-  submissions      HomeworkSubmission[] @relation("StudentSubmissions")
-  reviewedByAdmin  HomeworkSubmission[] @relation("ReviewerSubmissions")
-  achievements     UserAchievement[]
+  lessonProgress    LessonProgress[]
+  quizAttempts      QuizAttempt[]
+  submissions       HomeworkSubmission[] @relation("StudentSubmissions")
+  reviewedByAdmin   HomeworkSubmission[] @relation("ReviewerSubmissions")
+  achievements      UserAchievement[]
+  notificationState NotificationState?
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  href      String
+  createdAt DateTime @default(now())
+}
+
+model NotificationState {
+  userId     String   @id
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lastSeenAt DateTime
 }
 
 model Module {

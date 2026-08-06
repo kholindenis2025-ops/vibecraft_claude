@@ -17,6 +17,7 @@ export function VideoEmbed({ url, directSrc }: { url?: string | null; directSrc?
   }
 
   const unavailable = directSrc && playbackFailed;
+  const downloadHref = directSrc ? `${directSrc}?download=1` : url;
 
   if (unavailable) {
     return (
@@ -25,7 +26,7 @@ export function VideoEmbed({ url, directSrc }: { url?: string | null; directSrc?
         <p className="text-sm">
           Не удалось встроить плеер прямо на странице. Открой видео по ссылке ниже.
         </p>
-        <a href={url} target="_blank" rel="noopener noreferrer" className="btn-secondary text-sm">
+        <a href={downloadHref} target="_blank" rel="noopener noreferrer" className="btn-secondary text-sm">
           <Download size={15} /> Открыть / скачать видео
         </a>
       </div>
@@ -45,7 +46,7 @@ export function VideoEmbed({ url, directSrc }: { url?: string | null; directSrc?
           />
         </div>
         <a
-          href={url}
+          href={downloadHref}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1.5 self-start text-xs text-text-dim hover:text-accent"
@@ -78,21 +79,21 @@ export function SlidesEmbed({ url, directSrc }: { url?: string | null; directSrc
     );
   }
 
+  const downloadHref = directSrc ? `${directSrc}?download=1` : url;
+
   return (
     <div className="flex flex-col gap-2">
       <div className="aspect-video overflow-hidden rounded-xl border border-border">
         <iframe src={directSrc ?? toEmbedUrl(url)} className="h-full w-full" allowFullScreen />
       </div>
-      {directSrc && (
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1.5 self-start text-xs text-text-dim hover:text-accent"
-        >
-          <Download size={13} /> Скачать презентацию
-        </a>
-      )}
+      <a
+        href={downloadHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-1.5 self-start text-xs text-text-dim hover:text-accent"
+      >
+        <Download size={13} /> Скачать презентацию
+      </a>
     </div>
   );
 }

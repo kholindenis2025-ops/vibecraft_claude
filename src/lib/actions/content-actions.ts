@@ -182,6 +182,22 @@ export async function adminUpdateLessonAction(
     return { error: "У домашнего задания должно быть название" };
   }
 
+  const existing = await prisma.lesson.findUnique({
+    where: { id: lessonId },
+    select: {
+      videos: { select: { url: true } },
+      slides: { select: { url: true } },
+      module: { select: { title: true } },
+    },
+  });
+  if (!existing) {
+    return { error: "Урок не найден" };
+  }
+  const existingVideoUrls = new Set(existing.videos.map((v) => v.url));
+  const existingSlideUrls = new Set(existing.slides.map((s) => s.url));
+  const newVideoCount = videos.filter((v) => !existingVideoUrls.has(v.url)).length;
+  const newSlideCount = slides.filter((s) => !existingSlideUrls.has(s.url)).length;
+
   await prisma.$transaction(async (tx) => {
     await tx.lesson.update({
       where: { id: lessonId },
@@ -234,7 +250,25 @@ export async function adminUpdateLessonAction(
     }
   });
 
+  if (newVideoCount > 0 || newSlideCount > 0) {
+    const parts: string[] = [];
+    if (newVideoCount > 0) {
+      parts.push(newVideoCount > 1 ? `новое видео (${newVideoCount})` : "новое видео");
+    }
+    if (newSlideCount > 0) {
+      parts.push(newSlideCount > 1 ? `новая презентация (${newSlideCount})` : "новая презентация");
+    }
+    await prisma.notification.create({
+      data: {
+        title: `${existing.module.title} · ${title}`,
+        message: `Добавлено: ${parts.join(" и ")}`,
+        href: lessonPath,
+      },
+    });
+  }
+
   revalidatePath(lessonPath);
   revalidatePath("/admin/content");
+  revalidatePath("/updates");
   return { success: true };
 }
