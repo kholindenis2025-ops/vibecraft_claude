@@ -91,6 +91,30 @@ export async function adminDeleteLessonAction(lessonId: string): Promise<void> {
   revalidatePath("/admin/content");
 }
 
+export async function adminReorderLessonsAction(moduleId: string, lessonIds: string[]): Promise<void> {
+  await requireAdmin();
+
+  const existing = await prisma.lesson.findMany({
+    where: { moduleId },
+    select: { id: true },
+  });
+  const existingIds = new Set(existing.map((l) => l.id));
+  if (lessonIds.length !== existing.length || !lessonIds.every((id) => existingIds.has(id))) {
+    return;
+  }
+
+  await prisma.$transaction(async (tx) => {
+    for (let i = 0; i < lessonIds.length; i++) {
+      await tx.lesson.update({ where: { id: lessonIds[i] }, data: { order: -(i + 1) } });
+    }
+    for (let i = 0; i < lessonIds.length; i++) {
+      await tx.lesson.update({ where: { id: lessonIds[i] }, data: { order: i + 1 } });
+    }
+  });
+
+  revalidatePath("/admin/content");
+}
+
 function parseJsonArray<T>(raw: FormDataEntryValue | null, guard: (v: unknown) => v is T): T[] {
   if (typeof raw !== "string" || !raw) return [];
   try {

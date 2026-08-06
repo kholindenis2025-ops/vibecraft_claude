@@ -1,13 +1,12 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { FileEdit, ClipboardList, PlayCircle, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { groupByCategory, CATEGORY_SECTION_LABELS, CATEGORY_CARD_LABELS, CATEGORY_ORDER, type ModuleCategory } from "@/lib/categories";
 import { MODULE_ICONS } from "@/lib/module-icons";
 import { adminCreateModuleAction, adminCreateLessonAction } from "@/lib/actions/content-actions";
 import { AdminDeleteModuleButton } from "@/components/AdminDeleteModuleButton";
-import { AdminDeleteLessonButton } from "@/components/AdminDeleteLessonButton";
+import { AdminLessonList } from "@/components/AdminLessonList";
 
 export default async function AdminContentPage() {
   const user = await getCurrentUser();
@@ -40,7 +39,7 @@ export default async function AdminContentPage() {
         <h1 className="mt-1 text-2xl font-bold sm:text-3xl">Материалы курса</h1>
         <p className="mt-1 text-text-muted">
           Загружай видео, PDF, пиши текст урока, домашку, ссылки и словарь терминов. Добавляй новые модули и уроки
-          или удаляй ненужные.
+          или удаляй ненужные. Перетаскивай уроки за иконку {"⠿"} слева, чтобы менять их порядок.
         </p>
       </div>
 
@@ -89,30 +88,15 @@ export default async function AdminContentPage() {
                 <p className="font-bold">{mod.title}</p>
                 <AdminDeleteModuleButton moduleId={mod.id} moduleTitle={mod.title} />
               </div>
-              <div className="flex flex-col gap-1.5">
-                {mod.lessons.map((lesson) => (
-                  <div key={lesson.id} className="flex items-center gap-1">
-                    <Link
-                      href={`/admin/content/${lesson.id}`}
-                      className="flex min-w-0 flex-1 items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-bg-soft"
-                    >
-                      <FileEdit size={15} className="shrink-0 text-text-dim" />
-                      <span className="min-w-0 flex-1 truncate">{lesson.title}</span>
-                      {lesson._count.videos > 0 && (
-                        <span title="Есть видео">
-                          <PlayCircle size={14} className="shrink-0 text-accent" />
-                        </span>
-                      )}
-                      {lesson.homework && (
-                        <span title="Есть домашнее задание">
-                          <ClipboardList size={14} className="shrink-0 text-accent" />
-                        </span>
-                      )}
-                    </Link>
-                    <AdminDeleteLessonButton lessonId={lesson.id} lessonTitle={lesson.title} />
-                  </div>
-                ))}
-              </div>
+              <AdminLessonList
+                moduleId={mod.id}
+                lessons={mod.lessons.map((lesson) => ({
+                  id: lesson.id,
+                  title: lesson.title,
+                  hasHomework: Boolean(lesson.homework),
+                  videoCount: lesson._count.videos,
+                }))}
+              />
               <form
                 action={adminCreateLessonAction.bind(null, mod.id)}
                 className="mt-2 flex items-center gap-2 border-t border-border pt-3"
