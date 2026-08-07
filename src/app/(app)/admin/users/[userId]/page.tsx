@@ -10,7 +10,6 @@ import {
   FileText,
   Clock,
   XCircle,
-  Bell,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -56,7 +55,7 @@ export default async function AdminUserDetailPage({
   });
   if (!student) notFound();
 
-  const [modules, submissions, userAchievements, totalAchievements, notificationReads] = await Promise.all([
+  const [modules, submissions, userAchievements, totalAchievements] = await Promise.all([
     prisma.module.findMany({
       orderBy: { order: "asc" },
       include: {
@@ -65,7 +64,10 @@ export default async function AdminUserDetailPage({
           select: {
             id: true,
             title: true,
-            progress: { where: { userId: student.id }, select: { completed: true } },
+            progress: {
+              where: { userId: student.id },
+              select: { completed: true, completedAt: true },
+            },
           },
         },
       },
@@ -86,12 +88,6 @@ export default async function AdminUserDetailPage({
       orderBy: { unlockedAt: "desc" },
     }),
     prisma.achievement.count(),
-    prisma.notificationRead.findMany({
-      where: { userId: student.id },
-      orderBy: { readAt: "desc" },
-      take: 50,
-      include: { notification: true },
-    }),
   ]);
 
   const grouped = groupByCategory(
@@ -188,6 +184,7 @@ export default async function AdminUserDetailPage({
                       <div className="flex flex-col gap-1 border-t border-border p-3">
                         {mod.lessons.map((lesson) => {
                           const isDone = Boolean(lesson.progress[0]?.completed);
+                          const completedAt = lesson.progress[0]?.completedAt;
                           return (
                             <div key={lesson.id} className="flex items-center gap-2 text-sm">
                               {isDone ? (
@@ -195,7 +192,20 @@ export default async function AdminUserDetailPage({
                               ) : (
                                 <Circle size={15} className="shrink-0 text-text-dim" />
                               )}
-                              <span className={isDone ? "" : "text-text-muted"}>{lesson.title}</span>
+                              <span className={`min-w-0 flex-1 truncate ${isDone ? "" : "text-text-muted"}`}>
+                                {lesson.title}
+                              </span>
+                              {isDone && completedAt && (
+                                <span className="shrink-0 whitespace-nowrap text-xs text-text-dim">
+                                  {completedAt.toLocaleString("ru-RU", {
+                                    day: "numeric",
+                                    month: "short",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    timeZone: "Europe/Moscow",
+                                  })}
+                                </span>
+                              )}
                             </div>
                           );
                         })}
@@ -271,36 +281,6 @@ export default async function AdminUserDetailPage({
             );
           })}
         </div>
-      </div>
-
-      <div className="card p-5 sm:p-6">
-        <h2 className="mb-4 font-bold">Просмотренные обновления ({notificationReads.length})</h2>
-        {notificationReads.length === 0 ? (
-          <p className="text-sm text-text-dim">Ещё не открывал(а) ни одного уведомления.</p>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {notificationReads.map((r) => (
-              <div key={r.id} className="flex items-start gap-3 rounded-lg border border-border p-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent">
-                  <Bell size={14} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">{r.notification.title}</p>
-                  <p className="text-xs text-text-dim">
-                    Просмотрено{" "}
-                    {r.readAt.toLocaleString("ru-RU", {
-                      day: "numeric",
-                      month: "long",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      timeZone: "Europe/Moscow",
-                    })}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
