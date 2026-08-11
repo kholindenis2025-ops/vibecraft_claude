@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
-import { FileEdit, ClipboardList, PlayCircle, FileText, AlignLeft, GripVertical } from "lucide-react";
+import { FileEdit, ClipboardList, PlayCircle, FileText, AlignLeft, HelpCircle, GripVertical } from "lucide-react";
 import { adminReorderLessonsAction } from "@/lib/actions/content-actions";
 import { AdminDeleteLessonButton } from "@/components/AdminDeleteLessonButton";
 
@@ -11,6 +11,7 @@ export type LessonRow = {
   title: string;
   hasHomework: boolean;
   hasContent: boolean;
+  hasQuiz: boolean;
   videoCount: number;
   slideCount: number;
   contentUpdatedAt: Date | null;
@@ -83,6 +84,11 @@ export function AdminLessonList({ moduleId, lessons }: { moduleId: string; lesso
             {lesson.hasHomework && (
               <span title="Есть домашнее задание">
                 <ClipboardList size={14} className="shrink-0 text-accent" />
+              </span>
+            )}
+            {lesson.hasQuiz && (
+              <span title="Есть тест">
+                <HelpCircle size={14} className="shrink-0 text-accent" />
               </span>
             )}
             {lesson.contentUpdatedAt && (

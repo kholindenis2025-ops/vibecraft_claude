@@ -24,6 +24,7 @@ export default async function AdminEditLessonPage({
       videos: { orderBy: { order: "asc" } },
       slides: { orderBy: { order: "asc" } },
       homework: true,
+      quiz: { include: { questions: { orderBy: { order: "asc" } } } },
     },
   });
   if (!lesson) notFound();
@@ -59,6 +60,15 @@ export default async function AdminEditLessonPage({
           homeworkEnabled: Boolean(lesson.homework),
           homeworkTitle: lesson.homework?.title ?? "Задание",
           homeworkDescription: lesson.homework?.description ?? "",
+          quizEnabled: Boolean(lesson.quiz),
+          quizTitle: lesson.quiz?.title ?? "Проверь себя",
+          quizPassScore: lesson.quiz?.passScore ?? 70,
+          quizQuestions: (lesson.quiz?.questions ?? []).map((q) => ({
+            text: q.text,
+            options: JSON.parse(q.options) as string[],
+            correctIndex: q.correctIndex,
+            explanation: q.explanation,
+          })),
         }}
       />
     </div>
