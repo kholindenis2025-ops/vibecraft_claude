@@ -195,27 +195,11 @@ export async function adminUpdateLessonAction(
     return { error: "У домашнего задания должно быть название" };
   }
 
-  const quizEnabled = formData.get("quizEnabled") === "on";
-  const quizTitle = String(formData.get("quizTitle") ?? "").trim() || "Проверь себя";
-  const quizPassScoreRaw = String(formData.get("quizPassScore") ?? "").trim();
-  const quizPassScore = quizPassScoreRaw ? Number(quizPassScoreRaw) : 70;
-  const quizQuestions = parseJsonArray(formData.get("quizQuestionsJson"), isQuizQuestion);
-
-  if (quizEnabled) {
-    if (!Number.isFinite(quizPassScore) || quizPassScore < 0 || quizPassScore > 100) {
-      return { error: "Проходной балл теста должен быть от 0 до 100" };
-    }
-    if (quizQuestions.length === 0) {
-      return { error: "Добавь хотя бы один вопрос теста или выключи тест" };
-    }
-  }
-
   const existing = await prisma.lesson.findUnique({
     where: { id: lessonId },
     select: {
       videos: { select: { url: true } },
       slides: { select: { url: true } },
-      quiz: { select: { id: true } },
       module: { select: { title: true } },
     },
   });
@@ -278,41 +262,15 @@ export async function adminUpdateLessonAction(
     } else {
       await tx.homework.deleteMany({ where: { lessonId } });
     }
-
-    if (quizEnabled) {
-      const quiz = await tx.quiz.upsert({
-        where: { lessonId },
-        update: { title: quizTitle, passScore: quizPassScore },
-        create: { lessonId, title: quizTitle, passScore: quizPassScore },
-      });
-      await tx.quizQuestion.deleteMany({ where: { quizId: quiz.id } });
-      await tx.quizQuestion.createMany({
-        data: quizQuestions.map((q, i) => ({
-          quizId: quiz.id,
-          order: i + 1,
-          text: q.text,
-          options: JSON.stringify(q.options),
-          correctIndex: Math.min(Math.max(q.correctIndex, 0), q.options.length - 1),
-          explanation: q.explanation ?? "",
-        })),
-      });
-    } else {
-      await tx.quiz.deleteMany({ where: { lessonId } });
-    }
   });
 
-  const isNewQuiz = quizEnabled && !existing.quiz;
-
-  if (newVideoCount > 0 || newSlideCount > 0 || isNewQuiz) {
+  if (newVideoCount > 0 || newSlideCount > 0) {
     const parts: string[] = [];
     if (newVideoCount > 0) {
       parts.push(newVideoCount > 1 ? `новое видео (${newVideoCount})` : "новое видео");
     }
     if (newSlideCount > 0) {
       parts.push(newSlideCount > 1 ? `новая презентация (${newSlideCount})` : "новая презентация");
-    }
-    if (isNewQuiz) {
-      parts.push("новый тест");
     }
     await prisma.notification.create({
       data: {
@@ -327,4 +285,75 @@ export async function adminUpdateLessonAction(
   revalidatePath("/admin/content");
   revalidatePath("/updates");
   return { success: true };
+}
+
+export async function adminUpdateModuleQuizAction(
+  moduleId: string,
+  modulePath: string,
+  _prevState: ContentFormState,
+  formData: FormData
+): Promise<ContentFormState> {
+  await requireAdmin();
+
+  const title = String(formData.get("quizTitle") ?? "").trim() || "Проверь себя";
+  const passScoreRaw = String(formData.get("quizPassScore") ?? "").trim();
+  const passScore = passScoreRaw ? Number(passScoreRaw) : 70;
+  const questions = parseJsonArray(formData.get("quizQuestionsJson"), isQuizQuestion);
+
+  if (!Number.isFinite(passScore) || passScore < 0 || passScore > 100) {
+    return { error: "Проходной балл должен быть от 0 до 100" };
+  }
+  if (questions.length === 0) {
+    return { error: "Добавь хотя бы один вопрос" };
+  }
+
+  const mod = await prisma.module.findUnique({
+    where: { id: moduleId },
+    select: { title: true, quiz: { select: { id: true } } },
+  });
+  if (!mod) {
+    return { error: "Модуль не найден" };
+  }
+  const isNewQuiz = !mod.quiz;
+
+  await prisma.$transaction(async (tx) => {
+    const quiz = await tx.quiz.upsert({
+      where: { moduleId },
+      update: { title, passScore },
+      create: { moduleId, title, passScore },
+    });
+    await tx.quizQuestion.deleteMany({ where: { quizId: quiz.id } });
+    await tx.quizQuestion.createMany({
+      data: questions.map((q, i) => ({
+        quizId: quiz.id,
+        order: i + 1,
+        text: q.text,
+        options: JSON.stringify(q.options),
+        correctIndex: Math.min(Math.max(q.correctIndex, 0), q.options.length - 1),
+        explanation: q.explanation ?? "",
+      })),
+    });
+  });
+
+  if (isNewQuiz) {
+    await prisma.notification.create({
+      data: {
+        title: mod.title,
+        message: "Добавлен новый тест по модулю",
+        href: `${modulePath}/test`,
+      },
+    });
+  }
+
+  revalidatePath(modulePath);
+  revalidatePath(`${modulePath}/test`);
+  revalidatePath("/admin/content");
+  revalidatePath("/updates");
+  return { success: true };
+}
+
+export async function adminDeleteModuleQuizAction(moduleId: string): Promise<void> {
+  await requireAdmin();
+  await prisma.quiz.deleteMany({ where: { moduleId } });
+  revalidatePath("/admin/content");
 }

@@ -7,7 +7,6 @@ import { LessonContent } from "@/components/LessonContent";
 import { VideoEmbed, SlidesEmbed, ResourceLinks } from "@/components/MediaEmbed";
 import { isProxiedSlideUrl } from "@/lib/media";
 import { LessonCompleteButton } from "@/components/LessonCompleteButton";
-import { QuizBlock } from "@/components/QuizBlock";
 import { HomeworkForm } from "@/components/HomeworkForm";
 import { LessonGlossary } from "@/components/LessonGlossary";
 
@@ -29,7 +28,6 @@ export default async function LessonPage({
     where: { moduleId_slug: { moduleId: mod.id, slug: lessonSlug } },
     include: {
       progress: { where: { userId: user.id } },
-      quiz: { include: { questions: { orderBy: { order: "asc" } } } },
       terms: { orderBy: { order: "asc" } },
       resources: { orderBy: { order: "asc" } },
       videos: { orderBy: { order: "asc" } },
@@ -164,21 +162,6 @@ export default async function LessonPage({
           lessonPath={lessonPath}
         />
       </div>
-
-      {lesson.quiz && lesson.quiz.questions.length > 0 && (
-        <QuizBlock
-          quizId={lesson.quiz.id}
-          title={lesson.quiz.title}
-          passScore={lesson.quiz.passScore}
-          questions={lesson.quiz.questions.map((q) => ({
-            id: q.id,
-            text: q.text,
-            options: JSON.parse(q.options) as string[],
-          }))}
-          modulePath={modulePath}
-          lessonPath={lessonPath}
-        />
-      )}
 
       {lesson.homework && (
         <HomeworkForm

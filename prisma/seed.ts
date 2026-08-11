@@ -9,17 +9,6 @@ const adapter = new PrismaPg({
 });
 const prisma = new PrismaClient({ adapter });
 
-type QuizDef = {
-  title: string;
-  passScore: number;
-  questions: {
-    text: string;
-    options: string[];
-    correctIndex: number;
-    explanation: string;
-  }[];
-};
-
 type HomeworkDef = {
   title: string;
   description: string;
@@ -50,7 +39,6 @@ type LessonDef = {
   availableFrom?: string;
   videos?: MediaDef[];
   slides?: MediaDef[];
-  quiz?: QuizDef;
   homework?: HomeworkDef;
   terms?: TermDef[];
   resources?: ResourceDef[];
@@ -91,7 +79,6 @@ function lesson(opts: {
   durationMin?: number;
   videos?: MediaDef[];
   slides?: MediaDef[];
-  quiz?: QuizDef;
   homework?: HomeworkDef;
   terms?: TermDef[];
   resources?: ResourceDef[];
@@ -106,7 +93,6 @@ function lesson(opts: {
     durationMin: opts.durationMin,
     videos: opts.videos,
     slides: opts.slides,
-    quiz: opts.quiz,
     homework: opts.homework,
     terms: opts.terms,
     resources: opts.resources,
@@ -1019,30 +1005,6 @@ async function main() {
             data: { lessonId: lesson.id, order: s + 1, title: slide.title, url: slide.url },
           });
         }
-      }
-
-      if (l.quiz) {
-        const quiz = await prisma.quiz.upsert({
-          where: { lessonId: lesson.id },
-          update: { title: l.quiz.title, passScore: l.quiz.passScore },
-          create: { lessonId: lesson.id, title: l.quiz.title, passScore: l.quiz.passScore },
-        });
-        await prisma.quizQuestion.deleteMany({ where: { quizId: quiz.id } });
-        for (let k = 0; k < l.quiz.questions.length; k++) {
-          const q = l.quiz.questions[k];
-          await prisma.quizQuestion.create({
-            data: {
-              quizId: quiz.id,
-              order: k + 1,
-              text: q.text,
-              options: JSON.stringify(q.options),
-              correctIndex: q.correctIndex,
-              explanation: q.explanation,
-            },
-          });
-        }
-      } else {
-        await prisma.quiz.deleteMany({ where: { lessonId: lesson.id } });
       }
 
       await prisma.lessonTerm.deleteMany({ where: { lessonId: lesson.id } });

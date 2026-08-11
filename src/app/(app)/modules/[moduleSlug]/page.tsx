@@ -20,11 +20,23 @@ export default async function ModulePage({
   const mod = await prisma.module.findUnique({
     where: { slug: moduleSlug },
     include: {
+      quiz: {
+        select: {
+          id: true,
+          title: true,
+          questions: { select: { id: true } },
+          attempts: {
+            where: { userId: user.id },
+            orderBy: { createdAt: "desc" },
+            take: 1,
+            select: { passed: true },
+          },
+        },
+      },
       lessons: {
         orderBy: { order: "asc" },
         include: {
           progress: { where: { userId: user.id } },
-          quiz: { select: { id: true } },
           homework: {
             include: {
               submissions: {
@@ -106,6 +118,64 @@ export default async function ModulePage({
   const completed = mod.lessons.filter((l) => l.progress[0]?.completed).length;
   const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
 
+  const hasQuiz = Boolean(mod.quiz && mod.quiz.questions.length > 0);
+  const quizPassed = Boolean(mod.quiz?.attempts[0]?.passed);
+
+  const feedbackIndex = mod.lessons.findIndex((l) => l.title.includes("Обратная связь"));
+  const lessonsWithIndex = mod.lessons.map((lesson, i) => ({ lesson, i }));
+  const beforeFeedback =
+    feedbackIndex === -1 ? lessonsWithIndex : lessonsWithIndex.slice(0, feedbackIndex);
+  const feedbackAndAfter = feedbackIndex === -1 ? [] : lessonsWithIndex.slice(feedbackIndex);
+
+  const modSlug = mod.slug;
+
+  function renderLessonRow(lesson: (typeof lessonsWithIndex)[number]["lesson"], i: number) {
+    const isDone = Boolean(lesson.progress[0]?.completed);
+    return (
+      <Link
+        key={lesson.id}
+        href={`/modules/${modSlug}/${lesson.slug}`}
+        className="card card-hover flex items-center gap-4 p-4"
+      >
+        {isDone ? (
+          <CheckCircle2 className="shrink-0 text-accent" size={22} />
+        ) : (
+          <Circle className="shrink-0 text-text-dim" size={22} />
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="flex items-center gap-2 text-xs text-text-dim">
+            <span>Урок {i + 1}</span>
+            {lesson.format && <span className="badge !px-1.5 !py-0">{lesson.format}</span>}
+          </p>
+          <p className="truncate font-medium">{lesson.title}</p>
+          {lesson.availableFrom && lesson.availableFrom > new Date() && (
+            <p className="mt-0.5 flex items-center gap-1 text-xs text-text-dim">
+              <CalendarClock size={12} />
+              Доступно с{" "}
+              {lesson.availableFrom.toLocaleDateString("ru-RU", {
+                day: "numeric",
+                month: "long",
+                timeZone: "Europe/Moscow",
+              })}
+            </p>
+          )}
+        </div>
+        <div className="flex shrink-0 items-center gap-2 text-text-dim">
+          {lesson.durationMin > 0 && (
+            <span className="hidden items-center gap-1 text-xs sm:flex">
+              <Clock size={13} /> {lesson.durationMin} мин
+            </span>
+          )}
+          {lesson.homework && (
+            <span title="Есть домашнее задание">
+              <ClipboardList size={16} />
+            </span>
+          )}
+        </div>
+      </Link>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -135,57 +205,25 @@ export default async function ModulePage({
       </div>
 
       <div className="flex flex-col gap-2">
-        {mod.lessons.map((lesson, i) => {
-          const isDone = Boolean(lesson.progress[0]?.completed);
-          return (
-            <Link
-              key={lesson.id}
-              href={`/modules/${mod.slug}/${lesson.slug}`}
-              className="card card-hover flex items-center gap-4 p-4"
-            >
-              {isDone ? (
-                <CheckCircle2 className="shrink-0 text-accent" size={22} />
-              ) : (
-                <Circle className="shrink-0 text-text-dim" size={22} />
-              )}
-              <div className="min-w-0 flex-1">
-                <p className="flex items-center gap-2 text-xs text-text-dim">
-                  <span>Урок {i + 1}</span>
-                  {lesson.format && <span className="badge !px-1.5 !py-0">{lesson.format}</span>}
-                </p>
-                <p className="truncate font-medium">{lesson.title}</p>
-                {lesson.availableFrom && lesson.availableFrom > new Date() && (
-                  <p className="mt-0.5 flex items-center gap-1 text-xs text-text-dim">
-                    <CalendarClock size={12} />
-                    Доступно с{" "}
-                    {lesson.availableFrom.toLocaleDateString("ru-RU", {
-                      day: "numeric",
-                      month: "long",
-                      timeZone: "Europe/Moscow",
-                    })}
-                  </p>
-                )}
-              </div>
-              <div className="flex shrink-0 items-center gap-2 text-text-dim">
-                {lesson.durationMin > 0 && (
-                  <span className="hidden items-center gap-1 text-xs sm:flex">
-                    <Clock size={13} /> {lesson.durationMin} мин
-                  </span>
-                )}
-                {lesson.quiz && (
-                  <span title="Есть тест">
-                    <HelpCircle size={16} />
-                  </span>
-                )}
-                {lesson.homework && (
-                  <span title="Есть домашнее задание">
-                    <ClipboardList size={16} />
-                  </span>
-                )}
-              </div>
-            </Link>
-          );
-        })}
+        {beforeFeedback.map(({ lesson, i }) => renderLessonRow(lesson, i))}
+        {hasQuiz && (
+          <Link
+            href={`/modules/${mod.slug}/test`}
+            className="card card-hover flex items-center gap-4 p-4"
+          >
+            {quizPassed ? (
+              <CheckCircle2 className="shrink-0 text-accent" size={22} />
+            ) : (
+              <Circle className="shrink-0 text-text-dim" size={22} />
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-text-dim">Тест по модулю</p>
+              <p className="truncate font-medium">{mod.quiz?.title}</p>
+            </div>
+            <HelpCircle size={20} className="shrink-0 text-accent" />
+          </Link>
+        )}
+        {feedbackAndAfter.map(({ lesson, i }) => renderLessonRow(lesson, i))}
       </div>
     </div>
   );

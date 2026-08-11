@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Plus } from "lucide-react";
+import { Plus, HelpCircle } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { groupByCategory, CATEGORY_SECTION_LABELS, CATEGORY_CARD_LABELS, CATEGORY_ORDER, type ModuleCategory } from "@/lib/categories";
@@ -16,6 +17,7 @@ export default async function AdminContentPage() {
   const modules = await prisma.module.findMany({
     orderBy: { order: "asc" },
     include: {
+      quiz: { select: { id: true, _count: { select: { questions: true } } } },
       lessons: {
         orderBy: { order: "asc" },
         select: {
@@ -24,7 +26,6 @@ export default async function AdminContentPage() {
           content: true,
           contentUpdatedAt: true,
           homework: { select: { id: true } },
-          quiz: { select: { id: true } },
           _count: { select: { videos: true, slides: true } },
         },
       },
@@ -84,7 +85,16 @@ export default async function AdminContentPage() {
             <div key={mod.id} className="card p-4 sm:p-5">
               <div className="mb-3 flex items-center justify-between gap-3">
                 <p className="font-bold">{mod.title}</p>
-                <AdminDeleteModuleButton moduleId={mod.id} moduleTitle={mod.title} />
+                <div className="flex items-center gap-1">
+                  <Link
+                    href={`/admin/content/quiz/${mod.id}`}
+                    className="btn-ghost !px-2 !py-1.5 text-xs"
+                  >
+                    <HelpCircle size={14} />
+                    {mod.quiz ? `Тест (${mod.quiz._count.questions})` : "Добавить тест"}
+                  </Link>
+                  <AdminDeleteModuleButton moduleId={mod.id} moduleTitle={mod.title} />
+                </div>
               </div>
               <AdminLessonList
                 moduleId={mod.id}
@@ -92,7 +102,6 @@ export default async function AdminContentPage() {
                   id: lesson.id,
                   title: lesson.title,
                   hasHomework: Boolean(lesson.homework),
-                  hasQuiz: Boolean(lesson.quiz),
                   hasContent: lesson.content.trim().length > 0,
                   videoCount: lesson._count.videos,
                   slideCount: lesson._count.slides,

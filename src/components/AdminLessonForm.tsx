@@ -8,7 +8,6 @@ import {
 } from "@/lib/actions/content-actions";
 import { MediaListEditor, type MediaItem } from "@/components/MediaListEditor";
 import { ContentImageUpload } from "@/components/ContentImageUpload";
-import { QuizEditor, type QuizQuestionItem } from "@/components/QuizEditor";
 
 type Resource = { title: string; url: string };
 type Term = { term: string; definition: string };
@@ -27,10 +26,6 @@ type Initial = {
   homeworkEnabled: boolean;
   homeworkTitle: string;
   homeworkDescription: string;
-  quizEnabled: boolean;
-  quizTitle: string;
-  quizPassScore: number;
-  quizQuestions: QuizQuestionItem[];
 };
 
 export function AdminLessonForm({
@@ -53,8 +48,6 @@ export function AdminLessonForm({
   const [resources, setResources] = useState<Resource[]>(initial.resources);
   const [terms, setTerms] = useState<Term[]>(initial.terms);
   const [homeworkEnabled, setHomeworkEnabled] = useState(initial.homeworkEnabled);
-  const [quizEnabled, setQuizEnabled] = useState(initial.quizEnabled);
-  const [quizQuestions, setQuizQuestions] = useState<QuizQuestionItem[]>(initial.quizQuestions);
   const [videosUploading, setVideosUploading] = useState(false);
   const [slidesUploading, setSlidesUploading] = useState(false);
   const contentRef = useRef<HTMLTextAreaElement>(null);
@@ -66,7 +59,6 @@ export function AdminLessonForm({
       <input type="hidden" name="slidesJson" value={JSON.stringify(slides)} />
       <input type="hidden" name="resourcesJson" value={JSON.stringify(resources)} />
       <input type="hidden" name="termsJson" value={JSON.stringify(terms)} />
-      <input type="hidden" name="quizQuestionsJson" value={JSON.stringify(quizQuestions)} />
 
       <div className="card flex flex-col gap-4 p-5 sm:p-6">
         <h2 className="font-bold">Основное</h2>
@@ -271,50 +263,6 @@ export function AdminLessonForm({
               className="input resize-y"
             />
             <ContentImageUpload textareaRef={homeworkRef} />
-          </>
-        )}
-      </div>
-
-      <div className="card flex flex-col gap-3 p-5 sm:p-6">
-        <label className="flex items-center gap-2 font-bold">
-          <input
-            type="checkbox"
-            name="quizEnabled"
-            checked={quizEnabled}
-            onChange={(e) => setQuizEnabled(e.target.checked)}
-            className="h-4 w-4"
-          />
-          Тест
-        </label>
-        {quizEnabled && (
-          <>
-            <p className="text-sm text-text-dim">
-              Обычно тест ставят на завершающий урок модуля («Обратная связь по пройденному модулю»),
-              но можно и на любой другой.
-            </p>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-text-muted">Название теста</label>
-                <input
-                  name="quizTitle"
-                  defaultValue={initial.quizTitle}
-                  placeholder="Проверь себя"
-                  className="input"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-text-muted">Проходной балл, %</label>
-                <input
-                  name="quizPassScore"
-                  type="number"
-                  min={0}
-                  max={100}
-                  defaultValue={initial.quizPassScore}
-                  className="input"
-                />
-              </div>
-            </div>
-            <QuizEditor questions={quizQuestions} onChange={setQuizQuestions} />
           </>
         )}
       </div>
