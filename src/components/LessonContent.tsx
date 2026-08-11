@@ -21,15 +21,24 @@ export function LessonContent({ content }: { content: string }) {
         code: (props) => (
           <code className="rounded bg-bg-soft px-1.5 py-0.5 font-mono text-sm" {...props} />
         ),
-        img: ({ alt, ...props }) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            alt={alt ?? ""}
-            loading="lazy"
-            className="mb-3 w-full rounded-xl border border-border"
-            {...props}
-          />
-        ),
+        img: ({ src, alt, title }) => {
+          // Blob storage isn't reliably reachable for Russian viewers
+          // without a VPN — same reasoning as the video/slides proxies.
+          const proxiedSrc =
+            typeof src === "string" && src.includes("blob.vercel-storage.com")
+              ? `/api/image?url=${encodeURIComponent(src)}`
+              : src;
+          return (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={proxiedSrc}
+              alt={alt ?? ""}
+              title={title}
+              loading="lazy"
+              className="mb-3 w-full rounded-xl border border-border"
+            />
+          );
+        },
       }}
     >
       {content}
