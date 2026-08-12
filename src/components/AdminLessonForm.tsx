@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useRef, useState } from "react";
-import { Trash2, Plus, PlayCircle, FileText, CheckCircle2 } from "lucide-react";
+import { Trash2, Plus, PlayCircle, FileText, BookOpen, CheckCircle2 } from "lucide-react";
 import {
   adminUpdateLessonAction,
   type ContentFormState,
@@ -21,6 +21,7 @@ type Initial = {
   availableFrom: string;
   videos: MediaItem[];
   slides: MediaItem[];
+  materials: MediaItem[];
   resources: Resource[];
   terms: Term[];
   homeworkEnabled: boolean;
@@ -45,11 +46,13 @@ export function AdminLessonForm({
 
   const [videos, setVideos] = useState<MediaItem[]>(initial.videos);
   const [slides, setSlides] = useState<MediaItem[]>(initial.slides);
+  const [materials, setMaterials] = useState<MediaItem[]>(initial.materials);
   const [resources, setResources] = useState<Resource[]>(initial.resources);
   const [terms, setTerms] = useState<Term[]>(initial.terms);
   const [homeworkEnabled, setHomeworkEnabled] = useState(initial.homeworkEnabled);
   const [videosUploading, setVideosUploading] = useState(false);
   const [slidesUploading, setSlidesUploading] = useState(false);
+  const [materialsUploading, setMaterialsUploading] = useState(false);
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const homeworkRef = useRef<HTMLTextAreaElement>(null);
 
@@ -57,6 +60,7 @@ export function AdminLessonForm({
     <form action={formAction} className="flex flex-col gap-6">
       <input type="hidden" name="videosJson" value={JSON.stringify(videos)} />
       <input type="hidden" name="slidesJson" value={JSON.stringify(slides)} />
+      <input type="hidden" name="materialsJson" value={JSON.stringify(materials)} />
       <input type="hidden" name="resourcesJson" value={JSON.stringify(resources)} />
       <input type="hidden" name="termsJson" value={JSON.stringify(terms)} />
 
@@ -141,6 +145,23 @@ export function AdminLessonForm({
           icon={FileText}
           emptyLabel="Презентация не загружена"
           uploadLabel="Загрузить PDF"
+        />
+      </div>
+
+      <div className="card flex flex-col gap-3 p-5 sm:p-6">
+        <h2 className="font-bold">Материалы (Markdown)</h2>
+        <p className="text-sm text-text-dim">
+          Файлы .md для скачивания — доступны отдельной ссылкой, текст на странице урока не
+          отображается.
+        </p>
+        <MediaListEditor
+          items={materials}
+          onChange={setMaterials}
+          onBusyChange={setMaterialsUploading}
+          accept=".md,text/markdown,text/plain"
+          icon={BookOpen}
+          emptyLabel="Материал не загружен"
+          uploadLabel="Загрузить .md"
         />
       </div>
 
@@ -278,7 +299,7 @@ export function AdminLessonForm({
         </p>
       )}
 
-      {(videosUploading || slidesUploading) && (
+      {(videosUploading || slidesUploading || materialsUploading) && (
         <p className="text-sm text-text-dim">
           Дождись, пока файлы загрузятся, прежде чем сохранять.
         </p>
@@ -286,7 +307,7 @@ export function AdminLessonForm({
 
       <button
         type="submit"
-        disabled={pending || videosUploading || slidesUploading}
+        disabled={pending || videosUploading || slidesUploading || materialsUploading}
         className="btn-primary self-start"
       >
         {pending ? "Сохраняем…" : "Сохранить"}

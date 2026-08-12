@@ -186,6 +186,7 @@ export async function adminUpdateLessonAction(
   const terms = parseJsonArray(formData.get("termsJson"), isTerm);
   const videos = parseJsonArray(formData.get("videosJson"), isMedia);
   const slides = parseJsonArray(formData.get("slidesJson"), isMedia);
+  const materials = parseJsonArray(formData.get("materialsJson"), isMedia);
 
   const homeworkEnabled = formData.get("homeworkEnabled") === "on";
   const homeworkTitle = String(formData.get("homeworkTitle") ?? "").trim();
@@ -200,6 +201,7 @@ export async function adminUpdateLessonAction(
     select: {
       videos: { select: { url: true } },
       slides: { select: { url: true } },
+      materials: { select: { url: true } },
       module: { select: { title: true } },
     },
   });
@@ -208,8 +210,10 @@ export async function adminUpdateLessonAction(
   }
   const existingVideoUrls = new Set(existing.videos.map((v) => v.url));
   const existingSlideUrls = new Set(existing.slides.map((s) => s.url));
+  const existingMaterialUrls = new Set(existing.materials.map((m) => m.url));
   const newVideoCount = videos.filter((v) => !existingVideoUrls.has(v.url)).length;
   const newSlideCount = slides.filter((s) => !existingSlideUrls.has(s.url)).length;
+  const newMaterialCount = materials.filter((m) => !existingMaterialUrls.has(m.url)).length;
 
   await prisma.$transaction(async (tx) => {
     await tx.lesson.update({
@@ -239,6 +243,13 @@ export async function adminUpdateLessonAction(
       });
     }
 
+    await tx.lessonMaterial.deleteMany({ where: { lessonId } });
+    if (materials.length > 0) {
+      await tx.lessonMaterial.createMany({
+        data: materials.map((m, i) => ({ lessonId, order: i + 1, title: m.title || null, url: m.url })),
+      });
+    }
+
     await tx.lessonResource.deleteMany({ where: { lessonId } });
     if (resources.length > 0) {
       await tx.lessonResource.createMany({
@@ -264,13 +275,16 @@ export async function adminUpdateLessonAction(
     }
   });
 
-  if (newVideoCount > 0 || newSlideCount > 0) {
+  if (newVideoCount > 0 || newSlideCount > 0 || newMaterialCount > 0) {
     const parts: string[] = [];
     if (newVideoCount > 0) {
       parts.push(newVideoCount > 1 ? `новое видео (${newVideoCount})` : "новое видео");
     }
     if (newSlideCount > 0) {
       parts.push(newSlideCount > 1 ? `новая презентация (${newSlideCount})` : "новая презентация");
+    }
+    if (newMaterialCount > 0) {
+      parts.push(newMaterialCount > 1 ? `новый материал (${newMaterialCount})` : "новый материал");
     }
     await prisma.notification.create({
       data: {

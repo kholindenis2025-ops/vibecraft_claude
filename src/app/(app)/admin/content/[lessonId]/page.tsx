@@ -23,6 +23,7 @@ export default async function AdminEditLessonPage({
       resources: { orderBy: { order: "asc" } },
       videos: { orderBy: { order: "asc" } },
       slides: { orderBy: { order: "asc" } },
+      materials: { orderBy: { order: "asc" } },
       homework: true,
     },
   });
@@ -54,6 +55,7 @@ export default async function AdminEditLessonPage({
             : "",
           videos: lesson.videos.map((v) => ({ title: v.title ?? "", url: v.url })),
           slides: lesson.slides.map((s) => ({ title: s.title ?? "", url: s.url })),
+          materials: lesson.materials.map((m) => ({ title: m.title ?? "", url: m.url })),
           resources: lesson.resources.map((r) => ({ title: r.title, url: r.url })),
           terms: lesson.terms.map((t) => ({ term: t.term, definition: t.definition })),
           homeworkEnabled: Boolean(lesson.homework),

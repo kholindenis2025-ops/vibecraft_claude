@@ -108,8 +108,20 @@ model Lesson {
   resources LessonResource[]
   videos    LessonVideo[]
   slides    LessonSlide[]
+  materials LessonMaterial[]
 
   @@unique([moduleId, slug])
+}
+
+model LessonMaterial {
+  id       String @id @default(cuid())
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  order    Int
+  title    String?
+  url      String
+
+  @@unique([lessonId, order])
 }
 
 model LessonVideo {

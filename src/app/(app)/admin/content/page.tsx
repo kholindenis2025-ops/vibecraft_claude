@@ -26,7 +26,7 @@ export default async function AdminContentPage() {
           content: true,
           contentUpdatedAt: true,
           homework: { select: { id: true } },
-          _count: { select: { videos: true, slides: true } },
+          _count: { select: { videos: true, slides: true, materials: true } },
         },
       },
     },
@@ -105,6 +105,7 @@ export default async function AdminContentPage() {
                   hasContent: lesson.content.trim().length > 0,
                   videoCount: lesson._count.videos,
                   slideCount: lesson._count.slides,
+                  materialCount: lesson._count.materials,
                   contentUpdatedAt: lesson.contentUpdatedAt,
                 }))}
               />

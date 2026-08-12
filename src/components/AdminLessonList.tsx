@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
-import { FileEdit, ClipboardList, PlayCircle, FileText, AlignLeft, GripVertical } from "lucide-react";
+import { FileEdit, ClipboardList, PlayCircle, FileText, AlignLeft, BookOpen, GripVertical } from "lucide-react";
 import { adminReorderLessonsAction } from "@/lib/actions/content-actions";
 import { AdminDeleteLessonButton } from "@/components/AdminDeleteLessonButton";
 
@@ -13,6 +13,7 @@ export type LessonRow = {
   hasContent: boolean;
   videoCount: number;
   slideCount: number;
+  materialCount: number;
   contentUpdatedAt: Date | null;
 };
 
@@ -78,6 +79,11 @@ export function AdminLessonList({ moduleId, lessons }: { moduleId: string; lesso
             {lesson.slideCount > 0 && (
               <span title="Есть презентация (PDF)">
                 <FileText size={14} className="shrink-0 text-accent" />
+              </span>
+            )}
+            {lesson.materialCount > 0 && (
+              <span title="Есть материал (Markdown)">
+                <BookOpen size={14} className="shrink-0 text-accent" />
               </span>
             )}
             {lesson.hasHomework && (

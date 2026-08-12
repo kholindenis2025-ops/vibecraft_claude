@@ -9,6 +9,7 @@ import { isProxiedSlideUrl } from "@/lib/media";
 import { LessonCompleteButton } from "@/components/LessonCompleteButton";
 import { HomeworkForm } from "@/components/HomeworkForm";
 import { LessonGlossary } from "@/components/LessonGlossary";
+import { LessonMaterials } from "@/components/LessonMaterials";
 
 export default async function LessonPage({
   params,
@@ -32,6 +33,7 @@ export default async function LessonPage({
       resources: { orderBy: { order: "asc" } },
       videos: { orderBy: { order: "asc" } },
       slides: { orderBy: { order: "asc" } },
+      materials: { orderBy: { order: "asc" } },
       homework: {
         include: {
           submissions: {
@@ -151,6 +153,8 @@ export default async function LessonPage({
           <SlidesEmbed url={slide.url} directSrc={slideDirectSrc(slide)} />
         </div>
       ))}
+
+      <LessonMaterials materials={lesson.materials} />
 
       {lesson.resources.length > 0 && <ResourceLinks resources={lesson.resources} />}
 
