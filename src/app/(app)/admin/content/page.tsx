@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Plus, HelpCircle } from "lucide-react";
+import { Plus, HelpCircle, Pencil } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { groupByCategory, CATEGORY_SECTION_LABELS, CATEGORY_CARD_LABELS, CATEGORY_ORDER, type ModuleCategory } from "@/lib/categories";
-import { adminCreateModuleAction, adminCreateLessonAction } from "@/lib/actions/content-actions";
+import { adminCreateModuleAction, adminCreateLessonAction, adminUpdateModuleAction } from "@/lib/actions/content-actions";
 import { AdminDeleteModuleButton } from "@/components/AdminDeleteModuleButton";
 import { AdminLessonList } from "@/components/AdminLessonList";
 import { IconPicker } from "@/components/IconPicker";
@@ -96,6 +96,46 @@ export default async function AdminContentPage() {
                   <AdminDeleteModuleButton moduleId={mod.id} moduleTitle={mod.title} />
                 </div>
               </div>
+
+              <details className="mb-3 rounded-lg border border-border p-3">
+                <summary className="flex cursor-pointer list-none items-center gap-1.5 text-xs font-medium text-text-dim">
+                  <Pencil size={12} /> Изменить модуль
+                </summary>
+                <form
+                  action={adminUpdateModuleAction.bind(null, mod.id)}
+                  className="mt-3 flex flex-col gap-3"
+                >
+                  <input
+                    name="title"
+                    required
+                    defaultValue={mod.title}
+                    placeholder="Название модуля"
+                    className="input"
+                  />
+                  <textarea
+                    name="description"
+                    defaultValue={mod.description}
+                    placeholder="Краткое описание модуля"
+                    rows={2}
+                    className="input resize-y"
+                  />
+                  <select name="category" defaultValue={mod.category} className="input !w-auto">
+                    {CATEGORY_ORDER.map((c) => (
+                      <option key={c} value={c}>
+                        {CATEGORY_CARD_LABELS[c]}
+                      </option>
+                    ))}
+                  </select>
+                  <div>
+                    <p className="mb-2 text-xs font-medium text-text-dim">Иконка модуля</p>
+                    <IconPicker name="icon" defaultValue={mod.icon} />
+                  </div>
+                  <button type="submit" className="btn-primary self-start text-sm">
+                    Сохранить изменения
+                  </button>
+                </form>
+              </details>
+
               <AdminLessonList
                 moduleId={mod.id}
                 lessons={mod.lessons.map((lesson) => ({

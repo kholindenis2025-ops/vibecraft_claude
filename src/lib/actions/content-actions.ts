@@ -64,6 +64,29 @@ export async function adminDeleteModuleAction(moduleId: string): Promise<void> {
   revalidatePath("/admin/content");
 }
 
+export async function adminUpdateModuleAction(moduleId: string, formData: FormData): Promise<void> {
+  await requireAdmin();
+
+  const title = String(formData.get("title") ?? "").trim();
+  if (!title) return;
+
+  const description = String(formData.get("description") ?? "").trim();
+  const categoryRaw = String(formData.get("category") ?? "MODULE");
+  const category = MODULE_CATEGORIES.includes(categoryRaw as (typeof MODULE_CATEGORIES)[number])
+    ? (categoryRaw as (typeof MODULE_CATEGORIES)[number])
+    : "MODULE";
+  const icon = String(formData.get("icon") ?? "compass").trim() || "compass";
+
+  await prisma.module.update({
+    where: { id: moduleId },
+    data: { title, description, category, icon },
+  });
+
+  revalidatePath("/admin/content");
+  revalidatePath("/learn");
+  revalidatePath("/dashboard");
+}
+
 export async function adminCreateLessonAction(moduleId: string, formData: FormData): Promise<void> {
   await requireAdmin();
 
