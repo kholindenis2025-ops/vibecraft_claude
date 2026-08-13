@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { BookOpen, ChevronDown } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
 
 type Term = { term: string; definition: string };
 
@@ -46,9 +48,26 @@ export function LessonGlossary({ terms }: { terms: Term[] }) {
                 />
               </button>
               {isOpen && (
-                <p className="pl-11 pr-4 pb-4 text-sm leading-relaxed text-text-muted">
-                  {t.definition}
-                </p>
+                <div className="pl-11 pr-4 pb-4 text-sm leading-relaxed text-text-muted">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkBreaks]}
+                    components={{
+                      h2: (props) => <h2 className="mb-2 mt-4 font-bold text-text first:mt-0" {...props} />,
+                      h3: (props) => <h3 className="mb-1.5 mt-3 font-bold text-text first:mt-0" {...props} />,
+                      p: (props) => <p className="mb-2 last:mb-0" {...props} />,
+                      ul: (props) => <ul className="mb-2 ml-5 list-disc space-y-1" {...props} />,
+                      ol: (props) => <ol className="mb-2 ml-5 list-decimal space-y-1" {...props} />,
+                      li: (props) => <li {...props} />,
+                      strong: (props) => <strong className="font-semibold text-text" {...props} />,
+                      em: (props) => <em className="italic" {...props} />,
+                      code: (props) => (
+                        <code className="rounded bg-bg-soft px-1 py-0.5 font-mono text-xs" {...props} />
+                      ),
+                    }}
+                  >
+                    {t.definition}
+                  </ReactMarkdown>
+                </div>
               )}
             </div>
           );

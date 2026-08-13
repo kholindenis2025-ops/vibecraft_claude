@@ -241,8 +241,8 @@ export function AdminLessonForm({
                   prev.map((item, idx) => (idx === i ? { ...item, definition: e.target.value } : item))
                 )
               }
-              placeholder="Определение"
-              rows={2}
+              placeholder="Определение (поддерживает **жирный текст**, ## заголовки, списки; для новой строки — Enter)"
+              rows={4}
               className="input resize-none"
             />
           </div>
