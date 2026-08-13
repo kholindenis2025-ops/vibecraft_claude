@@ -16,15 +16,25 @@ export function LessonCompleteButton({ lessonId, initialCompleted, modulePath, l
   const [completed, setCompleted] = useState(initialCompleted);
   const [isPending, startTransition] = useTransition();
   const [unlocked, setUnlocked] = useState<{ title: string; icon: string }[]>([]);
+  const [error, setError] = useState(false);
 
   function toggle() {
+    const previous = completed;
     const next = !completed;
     setCompleted(next);
+    setError(false);
     startTransition(async () => {
-      const result = await setLessonCompleted(lessonId, next, { modulePath, lessonPath });
-      if (next && result.unlocked.length > 0) {
-        setUnlocked(result.unlocked);
-        setTimeout(() => setUnlocked([]), 5000);
+      try {
+        const result = await setLessonCompleted(lessonId, next, { modulePath, lessonPath });
+        if (next && result.unlocked.length > 0) {
+          setUnlocked(result.unlocked);
+          setTimeout(() => setUnlocked([]), 5000);
+        }
+      } catch {
+        // Save failed server-side — don't let the button silently lie about
+        // progress that was never actually persisted.
+        setCompleted(previous);
+        setError(true);
       }
     });
   }
