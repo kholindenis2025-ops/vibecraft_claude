@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { canAccessCourse } from "@/lib/access";
 
 // Streams a lesson PDF through our own origin instead of pointing the
 // iframe straight at blob.vercel-storage.com, which — like several other
@@ -12,6 +13,7 @@ export async function GET(
 ) {
   const user = await getCurrentUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
+  if (!canAccessCourse(user)) return new Response("Forbidden", { status: 403 });
 
   const { slideId } = await params;
   const download = req.nextUrl.searchParams.get("download");

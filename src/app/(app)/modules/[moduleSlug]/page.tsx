@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CheckCircle2, Circle, Clock, HelpCircle, ClipboardList, CalendarClock } from "lucide-react";
-import { requireUser } from "@/lib/auth";
+import { requireCourseAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ModuleIcon } from "@/lib/module-icons";
 import { lessonsWord } from "@/lib/plural";
@@ -15,7 +15,7 @@ export default async function ModulePage({
   params: Promise<{ moduleSlug: string }>;
 }) {
   const { moduleSlug } = await params;
-  const user = await requireUser();
+  const user = await requireCourseAccess();
 
   const mod = await prisma.module.findUnique({
     where: { slug: moduleSlug },

@@ -49,7 +49,7 @@ export async function registerAction(
   const passwordHash = await bcrypt.hash(password, 10);
 
   const user = await prisma.user.create({
-    data: { name, email, passwordHash, emailVerified: false },
+    data: { name, email, passwordHash, emailVerified: false, accessStatus: "PENDING" },
   });
 
   try {

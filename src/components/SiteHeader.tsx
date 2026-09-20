@@ -4,17 +4,22 @@ import { logoutAction } from "@/lib/actions/auth-actions";
 import { Logo } from "@/components/Logo";
 import { Avatar } from "@/components/Avatar";
 import { InstallAppButton } from "@/components/InstallAppButton";
+import { canAccessCourse, type AccessStatus } from "@/lib/access";
 
 type Props = {
   user: {
     name: string;
     email: string;
     role: "STUDENT" | "CURATOR" | "ADMIN";
+    accessStatus: AccessStatus;
+    emailVerified: boolean;
   };
   unreadCount?: number;
 };
 
 export function SiteHeader({ user, unreadCount = 0 }: Props) {
+  const courseOpen = canAccessCourse(user);
+
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-bg/85 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
@@ -33,20 +38,24 @@ export function SiteHeader({ user, unreadCount = 0 }: Props) {
             <LayoutDashboard size={16} />
             <span className="hidden lg:inline">Дашборд</span>
           </Link>
-          <Link
-            href="/learn"
-            className="flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
-          >
-            <BookOpen size={16} />
-            <span className="hidden lg:inline">Программа</span>
-          </Link>
-          <Link
-            href="/achievements"
-            className="flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
-          >
-            <Trophy size={16} />
-            <span className="hidden lg:inline">Достижения</span>
-          </Link>
+          {courseOpen && (
+            <>
+              <Link
+                href="/learn"
+                className="flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
+              >
+                <BookOpen size={16} />
+                <span className="hidden lg:inline">Программа</span>
+              </Link>
+              <Link
+                href="/achievements"
+                className="flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-2 text-text-muted transition-colors hover:bg-card hover:text-text"
+              >
+                <Trophy size={16} />
+                <span className="hidden lg:inline">Достижения</span>
+              </Link>
+            </>
+          )}
           {(user.role === "ADMIN" || user.role === "CURATOR") && (
             <>
               <Link

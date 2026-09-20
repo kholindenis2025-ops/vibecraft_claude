@@ -14,6 +14,7 @@ import {
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Avatar } from "@/components/Avatar";
+import { AdminAccessButtons } from "@/components/AdminAccessButtons";
 import { ModuleIcon } from "@/lib/module-icons";
 import { AchievementIcon } from "@/lib/achievement-icons";
 import { HomeworkReviewForm } from "@/components/HomeworkReviewForm";
@@ -51,6 +52,7 @@ export default async function AdminUserDetailPage({
       role: true,
       createdAt: true,
       emailVerified: true,
+      accessStatus: true,
     },
   });
   if (!student) notFound();
@@ -134,7 +136,21 @@ export default async function AdminUserDetailPage({
                 <MailWarning size={13} /> Почта не подтверждена
               </span>
             )}
+            {student.role === "STUDENT" && (
+              <span className="text-text-muted">
+                {student.accessStatus === "ACTIVE"
+                  ? "доступ открыт"
+                  : student.accessStatus === "REJECTED"
+                    ? "доступ отклонён"
+                    : "ждёт доступ"}
+              </span>
+            )}
           </div>
+          {currentUser.role === "ADMIN" && student.role === "STUDENT" && (
+            <div className="mt-3">
+              <AdminAccessButtons userId={student.id} accessStatus={student.accessStatus} />
+            </div>
+          )}
         </div>
         <div className="flex shrink-0 flex-col items-start gap-1 sm:items-end">
           <p className="text-2xl font-bold text-accent">{percent}%</p>

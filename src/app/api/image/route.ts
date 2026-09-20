@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
+import { canAccessCourse } from "@/lib/access";
 
 // Streams images embedded in lesson text through our own origin instead of
 // pointing straight at blob.vercel-storage.com — same reasoning as the
@@ -8,6 +9,7 @@ import { getCurrentUser } from "@/lib/auth";
 export async function GET(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
+  if (!canAccessCourse(user)) return new Response("Forbidden", { status: 403 });
 
   const url = req.nextUrl.searchParams.get("url");
   if (!url) return new Response("Missing url", { status: 400 });

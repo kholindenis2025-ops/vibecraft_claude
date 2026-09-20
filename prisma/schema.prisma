@@ -15,6 +15,12 @@ enum Role {
   ADMIN
 }
 
+enum AccessStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+}
+
 enum SubmissionStatus {
   PENDING
   APPROVED
@@ -35,6 +41,7 @@ model User {
   passwordHash String
   name         String
   role         Role     @default(STUDENT)
+  accessStatus AccessStatus @default(PENDING)
   createdAt    DateTime @default(now())
 
   emailVerified              Boolean   @default(false)

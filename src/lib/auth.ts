@@ -1,7 +1,9 @@
 import "server-only";
 import { cache } from "react";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { canAccessCourse } from "@/lib/access";
 
 export const getCurrentUser = cache(async () => {
   const session = await getSession();
@@ -14,6 +16,7 @@ export const getCurrentUser = cache(async () => {
       email: true,
       name: true,
       role: true,
+      accessStatus: true,
       createdAt: true,
       emailVerified: true,
     },
@@ -26,6 +29,14 @@ export async function requireUser() {
   const user = await getCurrentUser();
   if (!user) {
     throw new Error("UNAUTHENTICATED");
+  }
+  return user;
+}
+
+export async function requireCourseAccess() {
+  const user = await requireUser();
+  if (!canAccessCourse(user)) {
+    redirect("/dashboard");
   }
   return user;
 }

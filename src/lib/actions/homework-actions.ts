@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireUser, requireStaff } from "@/lib/auth";
+import { requireCourseAccess, requireStaff } from "@/lib/auth";
 import { evaluateAchievements } from "@/lib/achievements";
 
 export type HomeworkFormState = { error?: string; success?: boolean } | null;
@@ -13,7 +13,7 @@ export async function submitHomeworkAction(
   _prevState: HomeworkFormState,
   formData: FormData
 ): Promise<HomeworkFormState> {
-  const user = await requireUser();
+  const user = await requireCourseAccess();
 
   const answerText = String(formData.get("answerText") ?? "").trim();
   const answerUrl = String(formData.get("answerUrl") ?? "").trim();

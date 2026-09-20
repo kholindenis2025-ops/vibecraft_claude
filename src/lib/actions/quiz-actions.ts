@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/auth";
+import { requireCourseAccess } from "@/lib/auth";
 import { evaluateAchievements } from "@/lib/achievements";
 
 export type QuizResult = {
@@ -19,7 +19,7 @@ export async function submitQuizAttempt(
   answers: number[],
   revalidate: { modulePath: string; lessonPath: string }
 ): Promise<QuizResult> {
-  const user = await requireUser();
+  const user = await requireCourseAccess();
 
   const quiz = await prisma.quiz.findUniqueOrThrow({
     where: { id: quizId },

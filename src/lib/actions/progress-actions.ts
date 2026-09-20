@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/auth";
+import { requireCourseAccess } from "@/lib/auth";
 import { evaluateAchievements } from "@/lib/achievements";
 
 export async function setLessonCompleted(
@@ -10,7 +10,7 @@ export async function setLessonCompleted(
   completed: boolean,
   revalidate: { modulePath: string; lessonPath: string }
 ) {
-  const user = await requireUser();
+  const user = await requireCourseAccess();
 
   await prisma.lessonProgress.upsert({
     where: { userId_lessonId: { userId: user.id, lessonId } },

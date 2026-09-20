@@ -1,5 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
+import { isReadyForAdminReview } from "@/lib/access";
 
 export async function getAllUsersWithStats() {
   const [users, totalLessons] = await Promise.all([
@@ -10,6 +11,7 @@ export async function getAllUsersWithStats() {
         name: true,
         email: true,
         role: true,
+        accessStatus: true,
         createdAt: true,
         emailVerified: true,
         _count: {
@@ -28,8 +30,10 @@ export async function getAllUsersWithStats() {
     name: u.name,
     email: u.email,
     role: u.role,
+    accessStatus: u.accessStatus,
     createdAt: u.createdAt,
     emailVerified: u.emailVerified,
+    readyForReview: isReadyForAdminReview(u),
     completedLessons: u._count.lessonProgress,
     totalLessons,
     percent:

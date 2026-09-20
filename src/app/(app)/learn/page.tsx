@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
-import { requireUser } from "@/lib/auth";
+import { requireCourseAccess } from "@/lib/auth";
 import { getCourseSummary } from "@/lib/progress";
 import {
   CATEGORY_SECTION_LABELS,
@@ -12,7 +12,7 @@ import { ModuleIcon } from "@/lib/module-icons";
 import { lessonsWord } from "@/lib/plural";
 
 export default async function LearnPage() {
-  const user = await requireUser();
+  const user = await requireCourseAccess();
   const summary = await getCourseSummary(user.id);
   const groups = groupByCategory(summary.modules);
 

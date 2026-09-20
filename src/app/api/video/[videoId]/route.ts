@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { canAccessCourse } from "@/lib/access";
 import { resolveYandexDiskDirectUrl } from "@/lib/yandex-disk";
 import { isYandexDiskUrl } from "@/lib/yandex-disk";
 
@@ -16,6 +17,7 @@ export async function GET(
 ) {
   const user = await getCurrentUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
+  if (!canAccessCourse(user)) return new Response("Forbidden", { status: 403 });
 
   const { videoId } = await params;
   const download = req.nextUrl.searchParams.get("download");

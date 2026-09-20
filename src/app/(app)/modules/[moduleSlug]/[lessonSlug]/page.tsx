@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft, ChevronRight, Clock, CalendarClock } from "lucide-react";
-import { requireUser } from "@/lib/auth";
+import { requireCourseAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { LessonContent } from "@/components/LessonContent";
 import { VideoEmbed, SlidesEmbed, ResourceLinks } from "@/components/MediaEmbed";
@@ -17,7 +17,7 @@ export default async function LessonPage({
   params: Promise<{ moduleSlug: string; lessonSlug: string }>;
 }) {
   const { moduleSlug, lessonSlug } = await params;
-  const user = await requireUser();
+  const user = await requireCourseAccess();
 
   const mod = await prisma.module.findUnique({
     where: { slug: moduleSlug },

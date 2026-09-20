@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { canAccessCourse } from "@/lib/access";
 
 function filenameFor(url: string, title: string | null): string {
   let ext = "md";
@@ -24,6 +25,7 @@ export async function GET(
 ) {
   const user = await getCurrentUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
+  if (!canAccessCourse(user)) return new Response("Forbidden", { status: 403 });
 
   const { materialId } = await params;
   const material = await prisma.lessonMaterial.findUnique({

@@ -1060,6 +1060,7 @@ async function main() {
         passwordHash,
         name: "Куратор курса",
         role: "ADMIN",
+        accessStatus: "ACTIVE",
         emailVerified: true,
       },
     });

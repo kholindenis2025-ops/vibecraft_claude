@@ -74,12 +74,47 @@ export async function adminSetUserRoleAction(userId: string, role: string) {
     throw new Error("Неизвестная роль");
   }
 
+  const nextRole = role as (typeof ASSIGNABLE_ROLES)[number];
+
   await prisma.user.update({
     where: { id: userId },
-    data: { role: role as (typeof ASSIGNABLE_ROLES)[number] },
+    data: {
+      role: nextRole,
+      ...(nextRole === "ADMIN" || nextRole === "CURATOR" ? { accessStatus: "ACTIVE" as const } : {}),
+    },
   });
 
   revalidatePath("/admin/users");
+  revalidatePath(`/admin/users/${userId}`);
+}
+
+const ACCESS_STATUSES = ["PENDING", "ACTIVE", "REJECTED"] as const;
+
+export async function adminSetUserAccessAction(userId: string, accessStatus: string) {
+  await requireAdmin();
+
+  if (!ACCESS_STATUSES.includes(accessStatus as (typeof ACCESS_STATUSES)[number])) {
+    throw new Error("Неизвестный статус доступа");
+  }
+
+  const target = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true },
+  });
+  if (!target) {
+    throw new Error("Пользователь не найден");
+  }
+  if (target.role === "ADMIN" || target.role === "CURATOR") {
+    throw new Error("У админа и куратора доступ всегда есть");
+  }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { accessStatus: accessStatus as (typeof ACCESS_STATUSES)[number] },
+  });
+
+  revalidatePath("/admin/users");
+  revalidatePath(`/admin/users/${userId}`);
 }
 
 export async function adminDeleteUserAction(userId: string) {

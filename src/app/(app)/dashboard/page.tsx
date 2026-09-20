@@ -5,9 +5,36 @@ import { getCourseSummary } from "@/lib/progress";
 import { prisma } from "@/lib/prisma";
 import { ModuleIcon } from "@/lib/module-icons";
 import { lessonsWord } from "@/lib/plural";
+import { canAccessCourse, waitingReason } from "@/lib/access";
 
 export default async function DashboardPage() {
   const user = await requireUser();
+  if (!canAccessCourse(user)) {
+    const reason = waitingReason(user) ?? "awaiting_admin";
+    const copy = {
+      confirm_email: {
+        title: "Подтверди почту",
+        text: "Пока почта не подтверждена, заявка админу не уходит и уроки закрыты.",
+      },
+      awaiting_admin: {
+        title: "Ждём одобрения администратора",
+        text: "Почта подтверждена. Админ видит заявку и откроет доступ вручную.",
+      },
+      rejected: {
+        title: "Доступ отклонён",
+        text: "Администратор не открыл обучение для этого аккаунта.",
+      },
+    }[reason];
+
+    return (
+      <div className="mx-auto flex min-h-[50vh] max-w-lg flex-col items-center justify-center gap-4 text-center">
+        <span className="kicker">Доступ</span>
+        <h1 className="text-2xl font-bold sm:text-3xl">{copy.title}</h1>
+        <p className="text-text-muted">{copy.text}</p>
+      </div>
+    );
+  }
+
   const summary = await getCourseSummary(user.id);
   const unlockedCount = await prisma.userAchievement.count({ where: { userId: user.id } });
   const totalAchievements = await prisma.achievement.count();

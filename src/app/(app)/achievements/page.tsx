@@ -1,10 +1,10 @@
 import { Lock } from "lucide-react";
-import { requireUser } from "@/lib/auth";
+import { requireCourseAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AchievementIcon } from "@/lib/achievement-icons";
 
 export default async function AchievementsPage() {
-  const user = await requireUser();
+  const user = await requireCourseAccess();
 
   const [achievements, userAchievements] = await Promise.all([
     prisma.achievement.findMany(),
