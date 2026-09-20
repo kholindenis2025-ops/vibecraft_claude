@@ -2,7 +2,7 @@
 
 import { getCurrentUser } from "@/lib/auth";
 import { sendSupportEmail } from "@/lib/email";
-import { parseSupportRequest } from "@/lib/support";
+import { formatSupportSendError, parseSupportRequest } from "@/lib/support";
 
 export type SupportFormState = {
   error?: string;
@@ -32,16 +32,7 @@ export async function sendSupportMessageAction(
     await sendSupportEmail(parsed.data);
   } catch (err) {
     console.error("Failed to send support email", err);
-    const detail = err instanceof Error ? err.message.trim() : "";
-    const known =
-      /domain is not verified|only send testing emails|not configured|не подтвердил/i.test(
-        detail
-      );
-    return {
-      error: known
-        ? `Не удалось отправить письмо: ${detail}`
-        : "Не удалось отправить письмо. Попробуй позже.",
-    };
+    return { error: formatSupportSendError(err) };
   }
 
   return { sent: true };

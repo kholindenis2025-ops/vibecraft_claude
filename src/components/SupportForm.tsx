@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { sendSupportMessageAction, type SupportFormState } from "@/lib/actions/support-actions";
+import { formatSupportIdentityHint, formatSupportSentMessage } from "@/lib/support";
 
 type Props = {
   identity: { name: string; email: string } | null;
@@ -23,7 +24,7 @@ export function SupportForm({ identity }: Props) {
         </span>
         <p className="text-lg font-semibold">Письмо отправлено</p>
         <p className="text-sm text-text-muted">
-          Ответим на {identity?.email ?? "указанную почту"}. Обычно это занимает немного времени.
+          {formatSupportSentMessage(identity?.email)}
         </p>
         <Link href={identity ? "/dashboard" : "/"} className="btn-secondary">
           Назад
@@ -36,7 +37,7 @@ export function SupportForm({ identity }: Props) {
     <form action={formAction} className="flex flex-col gap-4">
       {identity ? (
         <p className="rounded-lg border border-border bg-bg-soft px-3 py-2 text-sm text-text-muted">
-          От: <span className="text-text">{identity.name}</span> · {identity.email}
+          {formatSupportIdentityHint(identity.email)}
         </p>
       ) : (
         <>

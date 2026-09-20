@@ -24,7 +24,8 @@ export default async function SupportPage() {
         <div className="card p-6 sm:p-8">
           <h1 className="mb-1 text-xl font-bold">Написать в поддержку</h1>
           <p className="mb-6 text-sm text-text-muted">
-            Опиши проблему — письмо уйдёт команде VIBECRAFT. Ответим на ту почту, которую укажешь.
+            Опиши проблему — письмо уйдёт на support@vibe-craft.ru. Ответить
+            можно на вашу почту. В «отправленных» Gmail его не будет.
           </p>
           <SupportForm identity={identity} />
         </div>

@@ -3,13 +3,14 @@ import { Resend } from "resend";
 import {
   assertResendSendResult,
   buildSupportEmail,
+  resolveEmailFrom,
   type ParsedSupportRequest,
 } from "@/lib/support";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
-// send.vibe-craft.ru — верифицированный в Resend поддомен отправки.
-// onboarding@resend.dev умеет писать только владельцу аккаунта Resend.
-const FROM = process.env.EMAIL_FROM ?? "VIBECRAFT <noreply@send.vibe-craft.ru>";
+// Только send.vibe-craft.ru верифицирован в Resend и имеет SPF.
+// Корневой vibe-craft.ru без SPF Timeweb часто кладёт во спам или режет.
+const FROM = resolveEmailFrom();
 
 export async function sendVerificationEmail(to: string, name: string, code: string) {
   if (!resend) {

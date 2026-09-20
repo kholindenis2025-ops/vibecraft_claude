@@ -1,5 +1,6 @@
 export const SUPPORT_INBOX = "support@vibe-craft.ru";
 export const SUPPORT_SUBJECT_PREFIX = "[Поддержка VIBECRAFT]";
+export const SUPPORT_FROM = "VIBECRAFT <noreply@send.vibe-craft.ru>";
 
 export type SupportFormInput = {
   subject: string;
@@ -45,6 +46,30 @@ export function resolveSupportInbox(envInbox = process.env.SUPPORT_EMAIL): strin
     return candidate;
   }
   return SUPPORT_INBOX;
+}
+
+export function resolveEmailFrom(envFrom = process.env.EMAIL_FROM): string {
+  const candidate = envFrom?.trim() ?? "";
+  if (/@send\.vibe-craft\.ru\b/i.test(candidate)) {
+    return candidate;
+  }
+  return SUPPORT_FROM;
+}
+
+export function formatSupportIdentityHint(email: string): string {
+  return `Письмо уйдёт на ${SUPPORT_INBOX}. Ответить можно на вашу почту: ${email}.`;
+}
+
+export function formatSupportSentMessage(email?: string): string {
+  const reply = email?.trim() || "указанную почту";
+  return `Письмо ушло на ${SUPPORT_INBOX}. Ответа жди на ${reply}. В «отправленных» Gmail его не будет — письмо шлёт сайт, не твой ящик.`;
+}
+
+export function formatSupportSendError(err: unknown): string {
+  const detail = err instanceof Error ? err.message.trim() : "";
+  return detail
+    ? `Не удалось отправить письмо: ${detail}`
+    : "Не удалось отправить письмо. Попробуй позже.";
 }
 
 export function assertResendSendResult(result: ResendSendResult): void {
