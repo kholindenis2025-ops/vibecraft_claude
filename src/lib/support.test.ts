@@ -3,9 +3,9 @@ import assert from "node:assert/strict";
 import {
   assertResendSendResult,
   buildSupportEmail,
-  formatSupportIdentityHint,
   formatSupportSendError,
   formatSupportSentMessage,
+  formatSupportSubtitle,
   parseSupportRequest,
   resolveEmailFrom,
   resolveSupportInbox,
@@ -161,11 +161,19 @@ test("ящик поддержки берётся из SUPPORT_EMAIL, если а
   assert.equal(resolveSupportInbox("  Owner@Gmail.com  "), "owner@gmail.com");
 });
 
-test("From только с send.vibe-craft.ru, иначе подставляется проверенный адрес", () => {
-  assert.match(resolveEmailFrom("VIBECRAFT <noreply@send.vibe-craft.ru>"), /send\.vibe-craft\.ru/);
-  assert.match(resolveEmailFrom("VIBECRAFT <noreply@vibe-craft.ru>"), /send\.vibe-craft\.ru/);
-  assert.match(resolveEmailFrom("VIBECRAFT <onboarding@resend.dev>"), /send\.vibe-craft\.ru/);
-  assert.match(resolveEmailFrom(undefined), /send\.vibe-craft\.ru/);
+test("From берётся из EMAIL_FROM как есть, без подмены домена", () => {
+  assert.equal(resolveEmailFrom("VIBECRAFT <noreply@vibe-craft.ru>"), "VIBECRAFT <noreply@vibe-craft.ru>");
+  assert.equal(resolveEmailFrom("VIBECRAFT <onboarding@resend.dev>"), "VIBECRAFT <onboarding@resend.dev>");
+  assert.equal(
+    resolveEmailFrom("VIBECRAFT <noreply@send.vibe-craft.ru>"),
+    "VIBECRAFT <noreply@send.vibe-craft.ru>"
+  );
+});
+
+test("пустой EMAIL_FROM — тот же From, что у писем с кодом", () => {
+  assert.equal(resolveEmailFrom(undefined), "VIBECRAFT <onboarding@resend.dev>");
+  assert.equal(resolveEmailFrom(""), "VIBECRAFT <onboarding@resend.dev>");
+  assert.equal(resolveEmailFrom("   "), "VIBECRAFT <onboarding@resend.dev>");
 });
 
 test("пустой или некорректный SUPPORT_EMAIL падает на support@vibe-craft.ru", () => {
@@ -189,29 +197,31 @@ test("письмо можно адресовать в реальный ящик,
   assert.equal(email.replyTo, "anna@example.com");
 });
 
-test("форма не говорит, что письмо уходит с Gmail ученика", () => {
-  const hint = formatSupportIdentityHint("kholindenis2025@gmail.com");
-  const sent = formatSupportSentMessage("kholindenis2025@gmail.com");
+test("подзаголовок и успех говорят про ответ ученику, без канцелярита", () => {
+  const guest = formatSupportSubtitle(null);
+  const loggedIn = formatSupportSubtitle("kholindenis2025@gmail.com");
+  const sent = formatSupportSentMessage();
 
-  assert.match(hint, /support@vibe-craft\.ru/);
-  assert.match(hint, /kholindenis2025@gmail\.com/);
-  assert.match(hint, /ответить можно на вашу почту/i);
-  assert.doesNotMatch(hint, /^От:/);
-  assert.match(sent, /support@vibe-craft\.ru/);
-  assert.match(sent, /отправленных/i);
-  assert.match(sent, /сайт/i);
+  assert.equal(guest, "Опишите проблему. Мы ответим на почту, указанную ниже.");
+  assert.equal(loggedIn, "Опишите проблему. Ответ придёт на kholindenis2025@gmail.com.");
+  assert.equal(sent, "Обращение отправлено. Ответ придёт на вашу почту.");
+  assert.doesNotMatch(guest, /support@|письмо уйдёт|ответить можно/i);
+  assert.doesNotMatch(loggedIn, /support@|письмо уйдёт|ответить можно|отправленных/i);
+  assert.doesNotMatch(sent, /support@|отправленных|Gmail/i);
 });
 
-test("ошибка Resend всегда показывается в форме, а не прячется", () => {
-  assert.match(
-    formatSupportSendError(new Error("403 Forbidden")),
-    /403 Forbidden/
+test("ошибка Resend показывается по-русски, без сырого английского", () => {
+  const unverified = formatSupportSendError(
+    new Error("The send.vibe-craft.ru domain is not verified. Please add and verify your domain on https://resend.com/domains")
   );
-  assert.match(
-    formatSupportSendError(new Error("validation_error: invalid from")),
-    /invalid from/i
-  );
-  assert.match(formatSupportSendError("не объект"), /позже|не удалось/i);
+  const invalidFrom = formatSupportSendError(new Error("validation_error: invalid from"));
+  const generic = formatSupportSendError("не объект");
+
+  assert.match(unverified, /не удалось отправить/i);
+  assert.doesNotMatch(unverified, /domain is not verified|resend\.com/i);
+  assert.match(invalidFrom, /не удалось отправить/i);
+  assert.doesNotMatch(invalidFrom, /invalid from|validation_error/i);
+  assert.match(generic, /не удалось отправить/i);
 });
 
 test("успех Resend принимается только если есть id письма", () => {

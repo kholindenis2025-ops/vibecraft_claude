@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { sendSupportMessageAction, type SupportFormState } from "@/lib/actions/support-actions";
-import { formatSupportIdentityHint, formatSupportSentMessage } from "@/lib/support";
+import { formatSupportSentMessage } from "@/lib/support";
 
 type Props = {
   identity: { name: string; email: string } | null;
@@ -22,9 +22,9 @@ export function SupportForm({ identity }: Props) {
         <span className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-soft text-accent">
           <CheckCircle2 size={24} />
         </span>
-        <p className="text-lg font-semibold">Письмо отправлено</p>
+        <p className="text-lg font-semibold">Обращение отправлено</p>
         <p className="text-sm text-text-muted">
-          {formatSupportSentMessage(identity?.email)}
+          {formatSupportSentMessage()}
         </p>
         <Link href={identity ? "/dashboard" : "/"} className="btn-secondary">
           Назад
@@ -35,11 +35,7 @@ export function SupportForm({ identity }: Props) {
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
-      {identity ? (
-        <p className="rounded-lg border border-border bg-bg-soft px-3 py-2 text-sm text-text-muted">
-          {formatSupportIdentityHint(identity.email)}
-        </p>
-      ) : (
+      {!identity && (
         <>
           <div className="flex flex-col gap-1.5">
             <label htmlFor="name" className="text-sm font-medium text-text-muted">
@@ -53,12 +49,12 @@ export function SupportForm({ identity }: Props) {
               minLength={2}
               maxLength={60}
               className="input"
-              placeholder="Как к тебе обращаться"
+              placeholder="Как к вам обращаться"
             />
           </div>
           <div className="flex flex-col gap-1.5">
             <label htmlFor="email" className="text-sm font-medium text-text-muted">
-              Email
+              Почта
             </label>
             <input
               id="email"
@@ -84,13 +80,13 @@ export function SupportForm({ identity }: Props) {
           minLength={2}
           maxLength={120}
           className="input"
-          placeholder="Коротко, о чём вопрос"
+          placeholder="Коротко, в чём дело"
         />
       </div>
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor="message" className="text-sm font-medium text-text-muted">
-          Текст
+          Сообщение
         </label>
         <textarea
           id="message"
@@ -100,7 +96,7 @@ export function SupportForm({ identity }: Props) {
           maxLength={4000}
           rows={6}
           className="input min-h-32 resize-y"
-          placeholder="Опиши, что случилось и что уже пробовал"
+          placeholder="Что случилось и что уже пробовали"
         />
       </div>
 

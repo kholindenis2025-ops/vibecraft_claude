@@ -1,6 +1,6 @@
 export const SUPPORT_INBOX = "support@vibe-craft.ru";
 export const SUPPORT_SUBJECT_PREFIX = "[Поддержка VIBECRAFT]";
-export const SUPPORT_FROM = "VIBECRAFT <noreply@send.vibe-craft.ru>";
+export const DEFAULT_EMAIL_FROM = "VIBECRAFT <onboarding@resend.dev>";
 
 export type SupportFormInput = {
   subject: string;
@@ -50,26 +50,39 @@ export function resolveSupportInbox(envInbox = process.env.SUPPORT_EMAIL): strin
 
 export function resolveEmailFrom(envFrom = process.env.EMAIL_FROM): string {
   const candidate = envFrom?.trim() ?? "";
-  if (/@send\.vibe-craft\.ru\b/i.test(candidate)) {
+  if (candidate.includes("@")) {
     return candidate;
   }
-  return SUPPORT_FROM;
+  return DEFAULT_EMAIL_FROM;
 }
 
-export function formatSupportIdentityHint(email: string): string {
-  return `Письмо уйдёт на ${SUPPORT_INBOX}. Ответить можно на вашу почту: ${email}.`;
+export function formatSupportSubtitle(email?: string | null): string {
+  const reply = email?.trim();
+  if (reply) {
+    return `Опишите проблему. Ответ придёт на ${reply}.`;
+  }
+  return "Опишите проблему. Мы ответим на почту, указанную ниже.";
 }
 
-export function formatSupportSentMessage(email?: string): string {
-  const reply = email?.trim() || "указанную почту";
-  return `Письмо ушло на ${SUPPORT_INBOX}. Ответа жди на ${reply}. В «отправленных» Gmail его не будет — письмо шлёт сайт, не твой ящик.`;
+export function formatSupportSentMessage(): string {
+  return "Обращение отправлено. Ответ придёт на вашу почту.";
 }
 
 export function formatSupportSendError(err: unknown): string {
   const detail = err instanceof Error ? err.message.trim() : "";
-  return detail
-    ? `Не удалось отправить письмо: ${detail}`
-    : "Не удалось отправить письмо. Попробуй позже.";
+  if (/domain is not verified|not verified/i.test(detail)) {
+    return "Не удалось отправить обращение. Почтовый сервис не принял адрес отправителя. Попробуйте позже.";
+  }
+  if (/invalid.?from|from address|validation_error/i.test(detail)) {
+    return "Не удалось отправить обращение. Почтовый сервис отклонил адрес отправителя. Попробуйте позже.";
+  }
+  if (/rate.?limit|too many/i.test(detail)) {
+    return "Слишком много попыток. Подождите минуту и отправьте снова.";
+  }
+  if (/forbidden|unauthorized|api.?key/i.test(detail)) {
+    return "Не удалось отправить обращение. Почтовый сервис отклонил запрос. Попробуйте позже.";
+  }
+  return "Не удалось отправить обращение. Попробуйте позже.";
 }
 
 export function assertResendSendResult(result: ResendSendResult): void {
@@ -93,16 +106,16 @@ export function parseSupportRequest(
   const message = input.message.trim();
 
   if (subject.length < 2) {
-    return fail("Укажи тему обращения");
+    return fail("Укажите тему");
   }
   if (subject.length > 120) {
     return fail("Тема слишком длинная");
   }
   if (message.length < 10) {
-    return fail("Напиши текст обращения — хотя бы пару предложений");
+    return fail("Напишите сообщение — хотя бы пару предложений");
   }
   if (message.length > 4000) {
-    return fail("Текст слишком длинный");
+    return fail("Сообщение слишком длинное");
   }
 
   if (identity) {
@@ -121,13 +134,13 @@ export function parseSupportRequest(
   const email = (input.email ?? "").trim().toLowerCase();
 
   if (name.length < 2) {
-    return fail("Укажи имя");
+    return fail("Укажите имя");
   }
   if (name.length > 60) {
     return fail("Имя слишком длинное");
   }
   if (!EMAIL_RE.test(email)) {
-    return fail("Введи корректный email");
+    return fail("Введите корректную почту");
   }
 
   return { ok: true, data: { name, email, subject, message } };

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { SupportForm } from "@/components/SupportForm";
 import { Logo } from "@/components/Logo";
+import { formatSupportSubtitle } from "@/lib/support";
 
 export const metadata = {
   title: "Поддержка — VIBECRAFT",
@@ -24,8 +25,7 @@ export default async function SupportPage() {
         <div className="card p-6 sm:p-8">
           <h1 className="mb-1 text-xl font-bold">Написать в поддержку</h1>
           <p className="mb-6 text-sm text-text-muted">
-            Опиши проблему — письмо уйдёт на support@vibe-craft.ru. Ответить
-            можно на вашу почту. В «отправленных» Gmail его не будет.
+            {formatSupportSubtitle(identity?.email)}
           </p>
           <SupportForm identity={identity} />
         </div>

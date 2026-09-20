@@ -8,8 +8,7 @@ import {
 } from "@/lib/support";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
-// Только send.vibe-craft.ru верифицирован в Resend и имеет SPF.
-// Корневой vibe-craft.ru без SPF Timeweb часто кладёт во спам или режет.
+// Тот же From, что у писем с кодом подтверждения: EMAIL_FROM как есть.
 const FROM = resolveEmailFrom();
 
 export async function sendVerificationEmail(to: string, name: string, code: string) {
