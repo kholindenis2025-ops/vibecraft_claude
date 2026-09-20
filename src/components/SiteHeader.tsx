@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, BookOpen, Trophy, ClipboardCheck, Users, FileEdit, LogOut, Bell } from "lucide-react";
+import { LayoutDashboard, BookOpen, Trophy, ClipboardCheck, Users, FileEdit, LogOut, Bell, LifeBuoy } from "lucide-react";
 import { logoutAction } from "@/lib/actions/auth-actions";
 import { Logo } from "@/components/Logo";
 import { Avatar } from "@/components/Avatar";
@@ -106,6 +106,14 @@ export function SiteHeader({ user, unreadCount = 0 }: Props) {
             <Avatar name={user.name} size={32} />
             <span className="text-sm font-medium">{user.name}</span>
           </div>
+          <Link
+            href="/support"
+            className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-text-muted transition-colors hover:bg-card hover:text-accent"
+            title="Поддержка"
+          >
+            <LifeBuoy size={16} />
+            <span className="hidden lg:inline">Поддержка</span>
+          </Link>
           <form action={logoutAction}>
             <button
               type="submit"

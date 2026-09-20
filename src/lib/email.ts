@@ -1,5 +1,6 @@
 import "server-only";
 import { Resend } from "resend";
+import { buildSupportEmail, type ParsedSupportRequest } from "@/lib/support";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const FROM = process.env.EMAIL_FROM ?? "VIBECRAFT <onboarding@resend.dev>";
@@ -40,6 +41,28 @@ export async function sendVerificationEmail(to: string, name: string, code: stri
   // anyone but the account owner) looks identical to a successful one.
   if (result.error) {
     console.error("Resend rejected the email", result.error);
+    throw new Error(result.error.message);
+  }
+}
+
+export async function sendSupportEmail(data: ParsedSupportRequest) {
+  if (!resend) {
+    console.error("RESEND_API_KEY is not set — cannot send support email");
+    throw new Error("Email service is not configured");
+  }
+
+  const payload = buildSupportEmail(data);
+  const result = await resend.emails.send({
+    from: FROM,
+    to: payload.to,
+    replyTo: payload.replyTo,
+    subject: payload.subject,
+    html: payload.html,
+    text: payload.text,
+  });
+
+  if (result.error) {
+    console.error("Resend rejected the support email", result.error);
     throw new Error(result.error.message);
   }
 }

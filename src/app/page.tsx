@@ -46,6 +46,9 @@ export default async function HomePage() {
         </div>
         <div className="flex items-center gap-2">
           <InstallAppButton className="btn-ghost" />
+          <Link href="/support" className="btn-ghost">
+            Поддержка
+          </Link>
           {user ? (
             <Link href="/dashboard" className="btn-primary">
               В дашборд

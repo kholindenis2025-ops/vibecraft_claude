@@ -31,6 +31,9 @@ export default async function DashboardPage() {
         <span className="kicker">Доступ</span>
         <h1 className="text-2xl font-bold sm:text-3xl">{copy.title}</h1>
         <p className="text-text-muted">{copy.text}</p>
+        <Link href="/support" className="btn-primary mt-2">
+          Написать в поддержку
+        </Link>
       </div>
     );
   }

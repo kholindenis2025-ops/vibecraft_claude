@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
+import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import {
   verifyEmailCodeAction,
@@ -90,6 +91,9 @@ export function VerifyEmailForm() {
             Выйти и войти позже
           </button>
         </form>
+        <Link href="/support" className="text-xs text-text-dim hover:text-accent hover:underline">
+          Написать в поддержку
+        </Link>
       </div>
     </div>
   );

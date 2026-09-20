@@ -45,6 +45,11 @@ export function LoginForm() {
           Зарегистрироваться
         </Link>
       </p>
+      <p className="text-center text-xs text-text-dim">
+        <Link href="/support" className="hover:text-accent hover:underline">
+          Написать в поддержку
+        </Link>
+      </p>
     </form>
   );
 }
