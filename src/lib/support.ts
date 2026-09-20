@@ -32,7 +32,29 @@ export type SupportEmailPayload = {
   text: string;
 };
 
+export type ResendSendResult = {
+  data?: { id?: string } | null;
+  error?: { message: string } | null;
+};
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export function resolveSupportInbox(envInbox = process.env.SUPPORT_EMAIL): string {
+  const candidate = envInbox?.trim().toLowerCase() ?? "";
+  if (EMAIL_RE.test(candidate)) {
+    return candidate;
+  }
+  return SUPPORT_INBOX;
+}
+
+export function assertResendSendResult(result: ResendSendResult): void {
+  if (result.error) {
+    throw new Error(result.error.message);
+  }
+  if (!result.data?.id) {
+    throw new Error("Resend не подтвердил отправку: нет id письма");
+  }
+}
 
 function fail(error: string): SupportParseResult {
   return { ok: false, error };
@@ -94,7 +116,10 @@ function escapeHtml(value: string): string {
     .replaceAll('"', "&quot;");
 }
 
-export function buildSupportEmail(data: ParsedSupportRequest): SupportEmailPayload {
+export function buildSupportEmail(
+  data: ParsedSupportRequest,
+  inbox = resolveSupportInbox()
+): SupportEmailPayload {
   const text = [
     `Имя: ${data.name}`,
     `Почта: ${data.email}`,
@@ -117,7 +142,7 @@ export function buildSupportEmail(data: ParsedSupportRequest): SupportEmailPaylo
   </div>`;
 
   return {
-    to: SUPPORT_INBOX,
+    to: inbox,
     replyTo: data.email,
     subject: `${SUPPORT_SUBJECT_PREFIX} ${data.subject}`,
     html,

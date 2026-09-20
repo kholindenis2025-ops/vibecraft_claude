@@ -1,6 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildSupportEmail, parseSupportRequest } from "./support";
+import {
+  assertResendSendResult,
+  buildSupportEmail,
+  parseSupportRequest,
+  resolveSupportInbox,
+} from "./support";
 
 test("гость должен указать имя, почту, тему и текст", () => {
   const result = parseSupportRequest(
@@ -145,4 +150,42 @@ test("текст письма экранирует HTML, чтобы не лом�
   assert.doesNotMatch(email.html, /<script>/);
   assert.match(email.html, /&lt;script&gt;/);
   assert.match(email.html, /&lt;b&gt;вот это&lt;\/b&gt;/);
+});
+
+test("ящик поддержки берётся из SUPPORT_EMAIL, если адрес корректный", () => {
+  assert.equal(resolveSupportInbox("kholindenis2025@gmail.com"), "kholindenis2025@gmail.com");
+  assert.equal(resolveSupportInbox("  Owner@Gmail.com  "), "owner@gmail.com");
+});
+
+test("пустой или некорректный SUPPORT_EMAIL падает на support@vibe-craft.ru", () => {
+  assert.equal(resolveSupportInbox(undefined), "support@vibe-craft.ru");
+  assert.equal(resolveSupportInbox(""), "support@vibe-craft.ru");
+  assert.equal(resolveSupportInbox("не-почта"), "support@vibe-craft.ru");
+});
+
+test("письмо можно адресовать в реальный ящик, а не только на support@", () => {
+  const email = buildSupportEmail(
+    {
+      name: "Анна",
+      email: "anna@example.com",
+      subject: "Не приходит код",
+      message: "Запросила код два раза, письма нет.",
+    },
+    "kholindenis2025@gmail.com"
+  );
+
+  assert.equal(email.to, "kholindenis2025@gmail.com");
+  assert.equal(email.replyTo, "anna@example.com");
+});
+
+test("успех Resend принимается только если есть id письма", () => {
+  assert.doesNotThrow(() => assertResendSendResult({ data: { id: "abc" }, error: null }));
+  assert.throws(
+    () => assertResendSendResult({ data: null, error: { message: "domain is not verified" } }),
+    /domain is not verified/
+  );
+  assert.throws(
+    () => assertResendSendResult({ data: null, error: null }),
+    /не подтвердил|id/i
+  );
 });

@@ -1,9 +1,15 @@
 import "server-only";
 import { Resend } from "resend";
-import { buildSupportEmail, type ParsedSupportRequest } from "@/lib/support";
+import {
+  assertResendSendResult,
+  buildSupportEmail,
+  type ParsedSupportRequest,
+} from "@/lib/support";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
-const FROM = process.env.EMAIL_FROM ?? "VIBECRAFT <onboarding@resend.dev>";
+// send.vibe-craft.ru — верифицированный в Resend поддомен отправки.
+// onboarding@resend.dev умеет писать только владельцу аккаунта Resend.
+const FROM = process.env.EMAIL_FROM ?? "VIBECRAFT <noreply@send.vibe-craft.ru>";
 
 export async function sendVerificationEmail(to: string, name: string, code: string) {
   if (!resend) {
@@ -39,9 +45,11 @@ export async function sendVerificationEmail(to: string, name: string, code: stri
   // { data: null, error: {...} }. Without this check, a rejected send
   // (e.g. the sandbox onboarding@resend.dev domain refusing to deliver to
   // anyone but the account owner) looks identical to a successful one.
-  if (result.error) {
-    console.error("Resend rejected the email", result.error);
-    throw new Error(result.error.message);
+  try {
+    assertResendSendResult(result);
+  } catch (err) {
+    console.error("Resend rejected the email", result.error ?? err);
+    throw err;
   }
 }
 
@@ -61,8 +69,20 @@ export async function sendSupportEmail(data: ParsedSupportRequest) {
     text: payload.text,
   });
 
-  if (result.error) {
-    console.error("Resend rejected the support email", result.error);
-    throw new Error(result.error.message);
+  try {
+    assertResendSendResult(result);
+  } catch (err) {
+    console.error("Resend rejected the support email", {
+      to: payload.to,
+      from: FROM,
+      error: result.error ?? err,
+    });
+    throw err;
   }
+
+  console.info("Support email accepted", {
+    to: payload.to,
+    from: FROM,
+    id: result.data?.id,
+  });
 }

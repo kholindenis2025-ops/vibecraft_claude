@@ -32,7 +32,16 @@ export async function sendSupportMessageAction(
     await sendSupportEmail(parsed.data);
   } catch (err) {
     console.error("Failed to send support email", err);
-    return { error: "Не удалось отправить письмо. Попробуй позже." };
+    const detail = err instanceof Error ? err.message.trim() : "";
+    const known =
+      /domain is not verified|only send testing emails|not configured|не подтвердил/i.test(
+        detail
+      );
+    return {
+      error: known
+        ? `Не удалось отправить письмо: ${detail}`
+        : "Не удалось отправить письмо. Попробуй позже.",
+    };
   }
 
   return { sent: true };
